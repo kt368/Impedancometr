@@ -1,0 +1,18 @@
+#define BatCharge_OFF				GPIO_ClearValue ( 1, (1<<19) )
+#define BatCharge_ON				GPIO_SetValue ( 1, (1<<19) )
+#define DDS_FSYNC_HIGH			GPIO_SetValue (0, (1<<1) )
+#define DDS_FSYNC_LOW				GPIO_ClearValue (0, (1<<1) )
+#define Vbus_sys_SW_OFF			GPIO_ClearValue (0, (1<<10) )
+#define Vbus_sys_SW_ON			GPIO_SetValue (0, (1<<10) )
+#define AD8302_PH						GPIO_ClearValue (0, (1<<11) )
+#define AD8302_MAG					GPIO_SetValue (0, (1<<11) )
+#define V12SW_OFF						GPIO_ClearValue (1, (1<<22) )
+#define V12SW_ON						GPIO_SetValue (1, (1<<22) )
+#define VLED_SW_LOW					GPIO_ClearValue (1, (1<<23) )
+#define VLED_SW_HIGH				GPIO_SetValue (1, (1<<23) )
+#define SCRN_SEL_NO					GPIO_SetValue (2, (1<<8) )
+#define SCRN_SEL_YES				GPIO_ClearValue (2, (1<<8) )
+#define Vbat_supply_OFF			GPIO_ClearValue (1, (1<<4) )
+#define Vbat_supply_ON			GPIO_SetValue (1, (1<<4) )
+
+extern void V12SW_ON2(void);

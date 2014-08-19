@@ -1,0 +1,15 @@
+[user]
+	name = Grygorii Tymoshenko
+	email = kt368bm@gmail.com
+[core]
+	autocrlf = true
+[diff]
+	guitool = kdiff3
+[difftool "kdiff3"]
+	path = C:/Program Files/KDiff3/kdiff3.exe
+[merge]
+	tool = kdiff3
+[mergetool "kdiff3"]
+	path = C:/Program Files/KDiff3/kdiff3.exe
+[credential]
+	helper = !\\\"C:/Program Files/GitExtensions/GitCredentialWinStore/git-credential-winstore.exe\\\"
