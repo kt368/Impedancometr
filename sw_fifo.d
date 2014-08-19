@@ -1,0 +1,10 @@
+.\sw_fifo.o: source\SW_FIFO.c
+.\sw_fifo.o: .\include\SW_FIFO.h
+.\sw_fifo.o: .\include\LPC17XX\LPC17XX.h
+.\sw_fifo.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm3.h
+.\sw_fifo.o: C:\Keil_v5\ARM\ARMCC\bin\..\include\stdint.h
+.\sw_fifo.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cmInstr.h
+.\sw_fifo.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cmFunc.h
+.\sw_fifo.o: .\include\LPC17XX\system_LPC17xx.h
+.\sw_fifo.o: .\include\drivers\lpc17xx_uart.h
+.\sw_fifo.o: .\include\drivers\lpc_types.h

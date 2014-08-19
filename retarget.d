@@ -1,0 +1,12 @@
+.\retarget.o: source\Retarget.c
+.\retarget.o: C:\Keil_v5\ARM\ARMCC\bin\..\include\stdio.h
+.\retarget.o: .\include\Retarget.h
+.\retarget.o: .\include\drivers\lpc17xx_uart.h
+.\retarget.o: .\include\LPC17XX\LPC17xx.h
+.\retarget.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm3.h
+.\retarget.o: C:\Keil_v5\ARM\ARMCC\bin\..\include\stdint.h
+.\retarget.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cmInstr.h
+.\retarget.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cmFunc.h
+.\retarget.o: .\include\LPC17XX\system_LPC17xx.h
+.\retarget.o: .\include\drivers\lpc_types.h
+.\retarget.o: C:\Keil_v5\ARM\ARMCC\bin\..\include\stdlib.h

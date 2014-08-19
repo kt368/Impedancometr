@@ -1,0 +1,11 @@
+.\lpc17xx_i2s.o: source\drivers\lpc17xx_i2s.c
+.\lpc17xx_i2s.o: .\include\drivers\lpc17xx_i2s.h
+.\lpc17xx_i2s.o: .\include\LPC17XX\LPC17xx.h
+.\lpc17xx_i2s.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm3.h
+.\lpc17xx_i2s.o: C:\Keil_v5\ARM\ARMCC\bin\..\include\stdint.h
+.\lpc17xx_i2s.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cmInstr.h
+.\lpc17xx_i2s.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cmFunc.h
+.\lpc17xx_i2s.o: .\include\LPC17XX\system_LPC17xx.h
+.\lpc17xx_i2s.o: .\include\drivers\lpc_types.h
+.\lpc17xx_i2s.o: .\include\drivers\lpc17xx_clkpwr.h
+.\lpc17xx_i2s.o: .\include\drivers\lpc17xx_libcfg_default.h

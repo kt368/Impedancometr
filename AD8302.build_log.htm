@@ -3,12 +3,55 @@
 <pre>
 <h1>µVision Build Log</h1>
 <h2>Project:</h2>
-X:\AD8302\FW\AD8302.uvproj
+D:\Documents\Dropbox\Impedancometr\AD8302.uvproj
 Project File Date:  07/13/2014
 
 <h2>Output:</h2>
-Clean started: Project: 'AD8302'
-   deleting intermediate output files for target 'LPC1758'
+Build target 'LPC1758'
+compiling System.c...
+source\System.c(62): warning:  #177-D: variable "temp" was declared but never referenced
+                uint32_t temp = 0, temp2 = 0, temp3 = 0, temp4, temp5, adc_abs_counter=0, adc_ph_counter=0;
+source\System.c(62): warning:  #550-D: variable "temp4" was set but never used
+                uint32_t temp = 0, temp2 = 0, temp3 = 0, temp4, temp5, adc_abs_counter=0, adc_ph_counter=0;
+source\System.c(62): warning:  #550-D: variable "temp5" was set but never used
+                uint32_t temp = 0, temp2 = 0, temp3 = 0, temp4, temp5, adc_abs_counter=0, adc_ph_counter=0;
+source\System.c(316): warning:  #550-D: variable "PT_YIELD_FLAG" was set but never used
+        PT_BEGIN(pt);
+source\System.c(295): warning:  #177-D: variable "temp3" was declared but never referenced
+        uint8_t temp, temp2, temp3;
+source\System.c: 5 warnings, 0 errors
+linking...
+Program Size: Code=49956 RO-data=2164 RW-data=328 ZI-data=59576  
+".\AD8302.axf" - 0 Error(s), 5 Warning(s).
 </pre>
 </body>
 </html>
+owIndex, PHcalOnHighFreqHighIndex;
+source\System.c(925): warning:  #177-D: variable "PHcalOnLowFreqHighIndex" was declared but never referenced
+        float PHcalOnLowFreqLowIndex, PHcalOnLowFreqHighIndex, PHcalOnHighFreqLowIndex, PHcalOnHighFreqHighIndex;
+source\System.c(925): warning:  #177-D: variable "PHcalOnHighFreqLowIndex" was declared but never referenced
+        float PHcalOnLowFreqLowIndex, PHcalOnLowFreqHighIndex, PHcalOnHighFreqLowIndex, PHcalOnHighFreqHighIndex;
+source\System.c(925): warning:  #177-D: variable "PHcalOnHighFreqHighIndex" was declared but never referenced
+        float PHcalOnLowFreqLowIndex, PHcalOnLowFreqHighIndex, PHcalOnHighFreqLowIndex, PHcalOnHighFreqHighIndex;
+source\System.c(926): warning:  #177-D: variable "PHmeasuredOnLowFreqLowIndex" was declared but never referenced
+        float PHmeasuredOnLowFreqLowIndex, PHmeasuredOnLowFreqHighIndex, PHmeasuredOnHighFreqLowIndex, PHmeasuredOnHighFreqHighIndex;
+source\System.c(926): warning:  #177-D: variable "PHmeasuredOnLowFreqHighIndex" was declared but never referenced
+        float PHmeasuredOnLowFreqLowIndex, PHmeasuredOnLowFreqHighIndex, PHmeasuredOnHighFreqLowIndex, PHmeasuredOnHighFreqHighIndex;
+source\System.c(926): warning:  #177-D: variable "PHmeasuredOnHighFreqLowIndex" was declared but never referenced
+        float PHmeasuredOnLowFreqLowIndex, PHmeasuredOnLowFreqHighIndex, PHmeasuredOnHighFreqLowIndex, PHmeasuredOnHighFreqHighIndex;
+source\System.c(926): warning:  #177-D: variable "PHmeasuredOnHighFreqHighIndex" was declared but never referenced
+        float PHmeasuredOnLowFreqLowIndex, PHmeasuredOnLowFreqHighIndex, PHmeasuredOnHighFreqLowIndex, PHmeasuredOnHighFreqHighIndex;
+source\System.c: 13 warnings, 0 errors
+linking...
+Program Size: Code=49860 RO-data=2164 RW-data=328 ZI-data=59576  
+".\AD8302.axf" - 0 Error(s), 13 Warning(s).
+7-D: variable "PHmeasuredOnLowFreqHighIndex" was declared but never referenced
+        float PHmeasuredOnLowFreqLowIndex, PHmeasuredOnLowFreqHighIndex, PHmeasuredOnHighFreqLowIndex, PHmeasuredOnHighFreqHighIndex;
+source\System.c(926): warning:  #177-D: variable "PHmeasuredOnHighFreqLowIndex" was declared but never referenced
+        float PHmeasuredOnLowFreqLowIndex, PHmeasuredOnLowFreqHighIndex, PHmeasuredOnHighFreqLowIndex, PHmeasuredOnHighFreqHighIndex;
+source\System.c(926): warning:  #177-D: variable "PHmeasuredOnHighFreqHighIndex" was declared but never referenced
+        float PHmeasuredOnLowFreqLowIndex, PHmeasuredOnLowFreqHighIndex, PHmeasuredOnHighFreqLowIndex, PHmeasuredOnHighFreqHighIndex;
+source\System.c: 17 warnings, 0 errors
+linking...
+Program Size: Code=49860 RO-data=2164 RW-data=328 ZI-data=59576  
+".\AD8302.axf" - 0 Error(s), 17 Warning(s).

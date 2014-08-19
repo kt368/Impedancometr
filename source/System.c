@@ -919,7 +919,11 @@ void Measure(float results[2], uint16_t freq)
 	
 	struct IndZwith_uint_Z_str * pIndZwith_uint_Z;
 	
-	float temp1,temp2,temp3,temp4;
+	float ZcalOnLowFreqLowIndex, ZcalOnLowFreqHighIndex, ZcalOnHighFreqLowIndex, ZcalOnHighFreqHighIndex;
+	float ZmeasuredOnLowFreqLowIndex, ZmeasuredOnLowFreqHighIndex, ZmeasuredOnHighFreqLowIndex, ZmeasuredOnHighFreqHighIndex;
+	
+	float PHcalOnLowFreqLowIndex, PHcalOnLowFreqHighIndex, PHcalOnHighFreqLowIndex, PHcalOnHighFreqHighIndex;
+	float PHmeasuredOnLowFreqLowIndex, PHmeasuredOnLowFreqHighIndex, PHmeasuredOnHighFreqLowIndex, PHmeasuredOnHighFreqHighIndex;
 	
 	pIndZwith_uint_Z = malloc(sizeof(struct IndZwith_uint_Z_str)*nZ_cal);
 	
@@ -1007,21 +1011,24 @@ void Measure(float results[2], uint16_t freq)
 			//!!!!!!!!!!!!!Вот тут самы корректировка Среднее значение значений, откалиброванных по четырем точкам - частота выше,
 			//частота ниже, модуль импеданса выше и модуль импеданса ниже
 
+			// Сначала разберемся с модулем импеданса:
+			
+			ZcalOnLowFreqLowIndex = GetCalZOn_iZ_iF(pCorrectIndexes[0], freq_index);
+			ZcalOnLowFreqHighIndex = GetCalZOn_iZ_iF(pCorrectIndexes[1], freq_index);
+			ZcalOnHighFreqLowIndex = GetCalZOn_iZ_iF(pCorrectIndexes[0], freq_index+1);
+			ZcalOnHighFreqHighIndex = GetCalZOn_iZ_iF(pCorrectIndexes[1], freq_index+1);
+			
 			// Если измеренный импеданс находится между кривыми калибровочного импеданса с индексами 
 			// pCorrectIndexes[0] и pCorrectIndexes[1]
-			temp1 = GetCalZOn_iZ_iF(pCorrectIndexes[0], freq_index);
-			temp2 = GetCalZOn_iZ_iF(pCorrectIndexes[1], freq_index);
-			temp3 = GetCalZOn_iZ_iF(pCorrectIndexes[0], freq_index+1);
-			temp4 = GetCalZOn_iZ_iF(pCorrectIndexes[1], freq_index+1);
-			if ( ((mag>temp1) && (mag<temp2)) || ((mag<temp1) && (mag>temp2)) )
+			if ( ((mag>ZcalOnLowFreqLowIndex) && (mag<ZcalOnLowFreqHighIndex)) || ((mag<ZcalOnLowFreqLowIndex) && (mag>ZcalOnLowFreqHighIndex)) )
 			{
-				if (temp2>temp1)
+				if (ZcalOnLowFreqHighIndex>ZcalOnLowFreqLowIndex)
 				{
-					z_coef_1 = (float)((int16_t)mag - (int16_t)temp1) / (float)((int16_t)temp2 - (int16_t)temp1);
+					z_coef_1 = (float)((int16_t)mag - (int16_t)ZcalOnLowFreqLowIndex) / (float)((int16_t)ZcalOnLowFreqHighIndex - (int16_t)ZcalOnLowFreqLowIndex);
 				}
 				else
 				{
-					z_coef_1 = (float)((int16_t)mag - (int16_t)temp2) / (float)((int16_t)temp1 - (int16_t)temp2);
+					z_coef_1 = (float)((int16_t)mag - (int16_t)ZcalOnLowFreqHighIndex) / (float)((int16_t)ZcalOnLowFreqLowIndex - (int16_t)ZcalOnLowFreqHighIndex);
 				}
 				if (debug_mode==1)
 				{
@@ -1030,7 +1037,7 @@ void Measure(float results[2], uint16_t freq)
 			}
 			
 			// Если mag за границой кривой pCorrectIndexes[1]
-			else if (abs(mag-temp1) > abs(mag-temp2))
+			else if (abs(mag-ZcalOnLowFreqLowIndex) > abs(mag-ZcalOnLowFreqHighIndex))
 			{
 				if (debug_mode==1)
 				{
@@ -1052,22 +1059,22 @@ void Measure(float results[2], uint16_t freq)
 			// выше в функции GetCorrectIndexes. Определяестя расположение на частоте freq_index - нижней частоте диапазона, в
 			// который попадает измерительная частота freq.
 			
-			if ( ((mag>temp3) && (mag<temp4)) || ((mag<temp3) && (mag>temp4)) )
+			if ( ((mag>ZcalOnHighFreqLowIndex) && (mag<ZcalOnHighFreqHighIndex)) || ((mag<ZcalOnHighFreqLowIndex) && (mag>ZcalOnHighFreqHighIndex)) )
 			{
-				if (temp4>temp3)
+				if (ZcalOnHighFreqHighIndex>ZcalOnHighFreqLowIndex)
 				{
-					z_coef_2 = (float)((int16_t)mag - (int16_t)temp3) / (float)((int16_t)temp4 - (int16_t)temp3);
+					z_coef_2 = (float)((int16_t)mag - (int16_t)ZcalOnHighFreqLowIndex) / (float)((int16_t)ZcalOnHighFreqHighIndex - (int16_t)ZcalOnHighFreqLowIndex);
 				}
 				else
 				{
-					z_coef_2 = (float)((int16_t)mag - (int16_t)temp4) / (float)((int16_t)temp3 - (int16_t)temp4);
+					z_coef_2 = (float)((int16_t)mag - (int16_t)ZcalOnHighFreqHighIndex) / (float)((int16_t)ZcalOnHighFreqLowIndex - (int16_t)ZcalOnHighFreqHighIndex);
 				}
 				if (debug_mode==1)
 				{
 					printf("\nz_coef_2 = %f", z_coef_2);
 				}
 			}
-			else if (abs(mag-temp3) > abs(mag-temp4))
+			else if (abs(mag-ZcalOnHighFreqLowIndex) > abs(mag-ZcalOnHighFreqHighIndex))
 			{
 				if (debug_mode==1)
 				{
@@ -1087,21 +1094,118 @@ void Measure(float results[2], uint16_t freq)
 			// выше в функции GetCorrectIndexes. Определяестя расположение на частоте freq_index+1 - верхней частоте диапазона, в
 			// который попадает измерительная частота freq.
 			
-			temp1 = GetZOn_iF_for_Z(freq_index, mag, pCorrectIndexes[0]);
-			temp2 = GetZOn_iF_for_Z(freq_index, mag, pCorrectIndexes[1]);
-			temp3 = GetZOn_iF_for_Z(freq_index+1, mag, pCorrectIndexes[0]);
-			temp4 = GetZOn_iF_for_Z(freq_index+1, mag, pCorrectIndexes[1]);
+			ZmeasuredOnLowFreqLowIndex = GetZOn_iF_for_Z(freq_index, mag, pCorrectIndexes[0]);
+			ZmeasuredOnLowFreqHighIndex = GetZOn_iF_for_Z(freq_index, mag, pCorrectIndexes[1]);
+			ZmeasuredOnHighFreqLowIndex = GetZOn_iF_for_Z(freq_index+1, mag, pCorrectIndexes[0]);
+			ZmeasuredOnHighFreqHighIndex = GetZOn_iF_for_Z(freq_index+1, mag, pCorrectIndexes[1]);
 			
 			if (debug_mode==1)
 			{
-				printf("\nZ_freq_index_pCorrectIndexes[0] = %f", temp1);
-				printf("\nZ_freq_index_pCorrectIndexes[1] = %f", temp2);
-				printf("\nZ_freq_index+1_pCorrectIndexes[0] = %f", temp3);
-				printf("\nZ_freq_index+1_pCorrectIndexes[1] = %f", temp4);
+				printf("\nZ_freq_index_pCorrectIndexes[0] = %f", ZmeasuredOnLowFreqLowIndex);
+				printf("\nZ_freq_index_pCorrectIndexes[1] = %f", ZmeasuredOnLowFreqHighIndex);
+				printf("\nZ_freq_index+1_pCorrectIndexes[0] = %f", ZmeasuredOnHighFreqLowIndex);
+				printf("\nZ_freq_index+1_pCorrectIndexes[1] = %f", ZmeasuredOnHighFreqHighIndex);
 			}
 			
 			results[0] = (1-f_coef) * ((1-z_coef_1)*GetZOn_iF_for_Z(freq_index, mag, pCorrectIndexes[0]) + z_coef_1*GetZOn_iF_for_Z(freq_index, mag, pCorrectIndexes[1])) + f_coef * ((1-z_coef_2)*GetZOn_iF_for_Z(freq_index+1, mag, pCorrectIndexes[0]) + z_coef_2 * GetZOn_iF_for_Z(freq_index+1, mag, pCorrectIndexes[1]));
 			
+			// Теперь обработаем фазу импеданса:
+			
+			PHcalOnLowFreqLowIndex = GetCalZOn_iZ_iF(pCorrectIndexes[0], freq_index);
+			PHcalOnLowFreqHighIndex = GetCalZOn_iZ_iF(pCorrectIndexes[1], freq_index);
+			PHcalOnHighFreqLowIndex = GetCalZOn_iZ_iF(pCorrectIndexes[0], freq_index+1);
+			PHcalOnHighFreqHighIndex = GetCalZOn_iZ_iF(pCorrectIndexes[1], freq_index+1);
+			
+			// Если фаза измеренного импеданса находится между кривыми калибровочного импеданса с индексами 
+			// pCorrectIndexes[0] и pCorrectIndexes[1]
+			if ( ((ph>PHcalOnLowFreqLowIndex) && (mag<PHcalOnLowFreqHighIndex)) || ((mag<PHcalOnLowFreqLowIndex) && (mag>PHcalOnLowFreqHighIndex)) )
+			{
+				if (PHcalOnLowFreqHighIndex>PHcalOnLowFreqLowIndex)
+				{
+					z_coef_1 = (float)((int16_t)mag - (int16_t)PHcalOnLowFreqLowIndex) / (float)((int16_t)PHcalOnLowFreqHighIndex - (int16_t)PHcalOnLowFreqLowIndex);
+				}
+				else
+				{
+					z_coef_1 = (float)((int16_t)mag - (int16_t)PHcalOnLowFreqHighIndex) / (float)((int16_t)PHcalOnLowFreqLowIndex - (int16_t)PHcalOnLowFreqHighIndex);
+				}
+				if (debug_mode==1)
+				{
+					printf("\nz_coef_1 = %f", z_coef_1);
+				}
+			}
+			
+			// Если mag за границой кривой pCorrectIndexes[1]
+			else if (abs(mag-PHcalOnLowFreqLowIndex) > abs(mag-PHcalOnLowFreqHighIndex))
+			{
+				if (debug_mode==1)
+				{
+					printf("\nz_coef_1 = 1");
+				}
+				z_coef_1 = 1;
+			}
+			
+			// Иначе (если mag за границой кривой pCorrectIndexes[0])
+			else
+			{
+				if (debug_mode==1)
+				{
+					printf("\nz_coef_1 = 0");
+				}
+				z_coef_1 = 0;
+			}
+			// z_coef_1 - коэффициент, определяющий расположение модуля mag измеренного импеданса между ближайшими кривыми (найденными
+			// выше в функции GetCorrectIndexes. Определяестя расположение на частоте freq_index - нижней частоте диапазона, в
+			// который попадает измерительная частота freq.
+			
+			if ( ((mag>PHcalOnHighFreqLowIndex) && (mag<PHcalOnHighFreqHighIndex)) || ((mag<PHcalOnHighFreqLowIndex) && (mag>PHcalOnHighFreqHighIndex)) )
+			{
+				if (PHcalOnHighFreqHighIndex>PHcalOnHighFreqLowIndex)
+				{
+					z_coef_2 = (float)((int16_t)mag - (int16_t)PHcalOnHighFreqLowIndex) / (float)((int16_t)PHcalOnHighFreqHighIndex - (int16_t)PHcalOnHighFreqLowIndex);
+				}
+				else
+				{
+					z_coef_2 = (float)((int16_t)mag - (int16_t)PHcalOnHighFreqHighIndex) / (float)((int16_t)PHcalOnHighFreqLowIndex - (int16_t)PHcalOnHighFreqHighIndex);
+				}
+				if (debug_mode==1)
+				{
+					printf("\nz_coef_2 = %f", z_coef_2);
+				}
+			}
+			else if (abs(mag-PHcalOnHighFreqLowIndex) > abs(mag-PHcalOnHighFreqHighIndex))
+			{
+				if (debug_mode==1)
+				{
+					printf("\nz_coef_2 = 1");
+				}
+				z_coef_2 = 1;
+			}
+			else
+			{
+				if (debug_mode==1)
+				{
+					printf("\nz_coef_2 = 0");
+				}
+				z_coef_2 = 0;
+			}
+			// z_coef_2 - коэффициент, определяющий расположение модуля mag измеренного импеданса между ближайшими кривыми (найденными
+			// выше в функции GetCorrectIndexes. Определяестя расположение на частоте freq_index+1 - верхней частоте диапазона, в
+			// который попадает измерительная частота freq.
+			
+			PHmeasuredOnLowFreqLowIndex = GetZOn_iF_for_Z(freq_index, mag, pCorrectIndexes[0]);
+			PHmeasuredOnLowFreqHighIndex = GetZOn_iF_for_Z(freq_index, mag, pCorrectIndexes[1]);
+			PHmeasuredOnHighFreqLowIndex = GetZOn_iF_for_Z(freq_index+1, mag, pCorrectIndexes[0]);
+			PHmeasuredOnHighFreqHighIndex = GetZOn_iF_for_Z(freq_index+1, mag, pCorrectIndexes[1]);
+			
+			if (debug_mode==1)
+			{
+				printf("\nZ_freq_index_pCorrectIndexes[0] = %f", PHmeasuredOnLowFreqLowIndex);
+				printf("\nZ_freq_index_pCorrectIndexes[1] = %f", PHmeasuredOnLowFreqHighIndex);
+				printf("\nZ_freq_index+1_pCorrectIndexes[0] = %f", PHmeasuredOnHighFreqLowIndex);
+				printf("\nZ_freq_index+1_pCorrectIndexes[1] = %f", PHmeasuredOnHighFreqHighIndex);
+			}
+			
+			results[1] = (1-f_coef) * ((1-z_coef_1)*GetZOn_iF_for_Z(freq_index, mag, pCorrectIndexes[0]) + z_coef_1*GetZOn_iF_for_Z(freq_index, mag, pCorrectIndexes[1])) + f_coef * ((1-z_coef_2)*GetZOn_iF_for_Z(freq_index+1, mag, pCorrectIndexes[0]) + z_coef_2 * GetZOn_iF_for_Z(freq_index+1, mag, pCorrectIndexes[1]));
 		}
 	}
 	else
