@@ -687,7 +687,7 @@ void SortZIndOnCurF (struct IndZwith_uint_Z_str * pIndZwith_uint_Z, uint16_t fre
 	{
 		for (iZ=0; iZ<nZ_cal; iZ++)
 		{
-			pIndZwith_uint_Z[iZ].Z = GetCalZOn_iZ_iF (iZ, freq_counter);
+			pIndZwith_uint_Z[iZ].Z = GetCalZ_on_iZ_iF (iZ, freq_counter);
 			pIndZwith_uint_Z[iZ].iZ = iZ;
 		}
 	}
@@ -697,7 +697,7 @@ void SortZIndOnCurF (struct IndZwith_uint_Z_str * pIndZwith_uint_Z, uint16_t fre
 										//чем freq
 		for (iZ=0; iZ<nZ_cal; iZ++)
 		{
-			pIndZwith_uint_Z[iZ].Z = GetCalZOn_iZ_F(iZ, freq);
+			pIndZwith_uint_Z[iZ].Z = GetCalZ_on_F_iZ(iZ, freq);
 			pIndZwith_uint_Z[iZ].iZ = iZ;
 		}
 	}
@@ -752,30 +752,6 @@ int compare_structs_on_float_Z_and_iZ(const void *arg1, const void *arg2)
 	return ret;
 }
 
-///*********************************************************************//**
-//* @brief        	Функция возвращает калибровочное значение модуля импеданса на частоте cal_freq_list[freq_index]
-//									для калибровачной нагрузки с индексом iZ
-//	@param[freq_index]		Индекс частоты
-//	@param[iZ]		Индекс калибровачной нагрузки
-//* @return       	Калибровачное значение модуля импеданса (uint32_t)
-//**********************************************************************/
-//float GetZOn_iF_for_iZ (uint8_t freq_index, uint8_t iZ)
-//{
-//	float ret;
-//	if (freq_index < CalData[iZ].nFmin)
-//	{
-//		ret = CalData[iZ].gZmax;
-//	}
-//	else if (freq_index >= CalData[iZ].nFmax)
-//	{
-//		ret = CalData[iZ].gZmin;
-//	}
-//	else
-//	{
-//		ret = CalData[iZ].Zarray[freq_index - CalData[iZ].nFmin].Zmin;
-//	}
-//	return ret;
-//}
 
 /*********************************************************************//**
 * @brief        	Функция возвращает значение модуля импеданса нагрузки, показавшей импеданс Z единиц АЦП
@@ -784,13 +760,12 @@ int compare_structs_on_float_Z_and_iZ(const void *arg1, const void *arg2)
 									для нагрузки, 
 	@param[freq_index]		Индекс частоты
 	@param[iZ]		Индекс калибровачной нагрузки
-* @return       	Калибровачное значение модуля импеданса (uint32_t)
+* @return       	Калибровачное значение модуля импеданса (float)
 **********************************************************************/
-float GetZOn_iF_for_Z (uint8_t freq_index, uint16_t Z, uint8_t iZ)
+float GetRealZ_on_iF_iZ_for_Z (uint8_t freq_index, uint16_t Z, uint8_t iZ)
 {
 	float ret;
 
-	
 	if (freq_index < CalData[iZ].nFmin)
 	{
 		ret = Z*CalData[iZ].Zarray[0].k+CalData[iZ].Zarray[0].b;
@@ -808,13 +783,70 @@ float GetZOn_iF_for_Z (uint8_t freq_index, uint16_t Z, uint8_t iZ)
 }
 
 /*********************************************************************//**
+* @brief        	Функция рассчитывает значение модуля импеданса по данным калибровочной нагрузки iZ на частоте freq
+									при измеренном импеданса Z
+	@param[freq]		Частота, кГц
+	@param[iZ]			Индекс калибровочной нагрузки
+	@param[Z]		Измеренный импеданс, ед. АЦП
+* @return       	Реальное значение модуля измеренного импеданса
+**********************************************************************/
+float GetRealZ_on_F_iZ_for_Z(uint16_t freq, uint8_t iZ, uint16_t Z)
+{
+	uint8_t freq_index = 0;
+	float ret;
+	
+	while (cal_freq_list[freq_index] < freq)
+	{
+		freq_index++;
+	}
+	if (freq_index != 0)
+	{
+		freq_index--;
+	}
+	//Теперь freq_index - индекс нижней частоты частотного отрезка, который содержит зимерительную часоту freq.
+	if (freq_index < CalData[iZ].nFmin)
+	{
+		ret = CalData[iZ].Zarray[0].k * Z + CalData[iZ].Zarray[0].b;
+		return ret;
+	}
+	else if (freq_index >= CalData[iZ].nFmax)
+	{
+		ret = CalData[iZ].Zarray[CalData[iZ].nFmax - CalData[iZ].nFmin - 1].k * Z + CalData[iZ].Zarray[CalData[iZ].nFmax - CalData[iZ].nFmin - 1].b;
+		return ret;
+	}
+	else
+	{
+		freq_index = freq_index - CalData[iZ].nFmin;
+		//Теперь freq_index - индекс нижней частоты частотного отрезка, калибровочной нагрузки  который содержит зимерительную часоту freq.
+		ret = CalData[iZ].Zarray[freq_index].k * Z + CalData[iZ].Zarray[freq_index].b;
+		return ret;
+	}
+}
+
+uint32_t GetCalZ_on_iZ_iF (uint8_t iZ, uint8_t iF)
+{
+	if (iF <= CalData[iZ].nFmin)
+	{
+		return CalData[iZ].gZmax;
+	}
+	else if (iF >= CalData[iZ].nFmax)
+	{
+		return CalData[iZ].gZmin;
+	}
+	else
+	{
+		return CalData[iZ].Zarray[iF - CalData[iZ].nFmin - 1].Zmin;
+	}
+}
+
+/*********************************************************************//**
 * @brief        	Функция возвращает калибровочное значение модуля импеданса на частоте freq
 									для калибровачной нагрузки с индексом iZ
 	@param[freq]		Частота, кГц
 	@param[iZ]			Индекс калибровачной нагрузки
 * @return       	Калибровачное значение модуля импеданса (float)
 **********************************************************************/
-float GetCalZOn_iZ_F (uint8_t iZ, uint16_t freq)
+float GetCalZ_on_F_iZ (uint8_t iZ, uint16_t freq)
 {
 	float ret, t1,t2;
 	uint8_t freq_index=0;
@@ -833,11 +865,11 @@ float GetCalZOn_iZ_F (uint8_t iZ, uint16_t freq)
 	
 	if (freq_index < (nF_cal-1))
 	{
-		t1 = GetCalZOn_iZ_iF(iZ, freq_index);
-		t2 = GetCalZOn_iZ_iF(iZ, freq_index+1);
+		t1 = GetCalZ_on_iZ_iF(iZ, freq_index);
+		t2 = GetCalZ_on_iZ_iF(iZ, freq_index+1);
 		ret = t1 + (t2 - t1) * f_coef;;
 	}
-	else ret = GetCalZOn_iZ_iF(iZ, freq_index);
+	else ret = GetCalZ_on_iZ_iF(iZ, freq_index);
 	//Проверка, входит ли частота freq в калибровочные диапазоны частот для нагрузки iZ
 	if (freq_index < CalData[iZ].nFmin)
 	{
@@ -851,8 +883,21 @@ float GetCalZOn_iZ_F (uint8_t iZ, uint16_t freq)
 	return ret;
 }
 
-
-
+uint32_t GetCalPH_on_iZ_iF (uint8_t iZ, uint8_t iF)
+{
+	if (iF <= CalData[iZ].nFmin)
+	{
+		return CalData[iZ].gPHmax;
+	}
+	else if (iF >= CalData[iZ].nFmax)
+	{
+		return CalData[iZ].gPHmin;
+	}
+	else
+	{
+		return CalData[iZ].PHarray[iF - CalData[iZ].nFmin - 1].PHmin;
+	}
+}
 /*********************************************************************//**
 * @brief        	Функция возвращает калибровочное значение фазы импеданса на частоте freq
 									для калибровачной нагрузки с индексом iZ
@@ -861,9 +906,8 @@ float GetCalZOn_iZ_F (uint8_t iZ, uint16_t freq)
 	@param[iZ]			Индекс калибровачной нагрузки
 * @return       	Калибровачное значение фазы импеданса (float)
 **********************************************************************/
-float GetPHOn_F_for_iZ (uint16_t freq, uint8_t i_F_min, uint8_t iZ)
+float GetCalPH_on_F_iZ (uint8_t iZ, uint16_t freq)
 {
-	
 	float ret;
 	uint8_t freq_index=0;
 	
@@ -894,6 +938,73 @@ float GetPHOn_F_for_iZ (uint16_t freq, uint8_t i_F_min, uint8_t iZ)
 	
 	return ret;
 }
+/*********************************************************************//**
+* @brief        				Функция возвращает значение фазы импеданса нагрузки, показавшей фазу PH единиц АЦП
+												с использованием калибровочных данных для нагрузки с индексом iZ.
+												Калибровочные данные брать для частоты cal_freq_list[freq_index]
+	@param[freq_index]		Индекс частоты
+	@param[iZ]						Индекс калибровачной нагрузки
+* @return       				Калибровачное значение фазы импеданса (float)
+**********************************************************************/
+float GetRealPH_on_iF_iZ_for_PH (uint8_t freq_index, uint16_t PH, uint8_t iZ)
+{
+	float ret;
+
+	if (freq_index < CalData[iZ].nFmin)
+	{
+		ret = PH*CalData[iZ].PHarray[0].k+CalData[iZ].PHarray[0].b;
+	}
+	else if (freq_index >= CalData[iZ].nFmax)
+	{
+		ret = PH*CalData[iZ].PHarray[CalData[iZ].nFmax - 1 - CalData[iZ].nFmin].k+CalData[iZ].PHarray[CalData[iZ].nFmax - 1 - CalData[iZ].nFmin].b;
+	}
+	else
+	{
+		ret = PH*CalData[iZ].PHarray[freq_index - CalData[iZ].nFmin].k+CalData[iZ].PHarray[freq_index - CalData[iZ].nFmin].b;
+	}
+	return ret;
+}
+
+/*********************************************************************//**
+* @brief        			Функция рассчитывает значение фазы импеданса по данным калибровочной нагрузки iZ на частоте freq
+											при измеренном значении фазы импеданса PH
+	@param[freq]				Частота, кГц
+	@param[iZ]					Индекс калибровочной нагрузки
+	@param[PH]					Измеренный импеданс, ед. АЦП
+* @return       			Реальное значение модуля измеренного импеданса
+**********************************************************************/
+float GetRealPH_on_F_iZ_for_Z(uint16_t freq, uint8_t iZ, uint16_t PH)
+{
+	uint8_t freq_index = 0;
+	float ret;
+	
+	while (cal_freq_list[freq_index] < freq)
+	{
+		freq_index++;
+	}
+	if (freq_index != 0)
+	{
+		freq_index--;
+	}
+	//Теперь freq_index - индекс нижней частоты частотного отрезка, который содержит зимерительную часоту freq.
+	if (freq_index < CalData[iZ].nFmin)
+	{
+		ret = CalData[iZ].PHarray[0].k * PH + CalData[iZ].PHarray[0].b;
+		return ret;
+	}
+	else if (freq_index >= CalData[iZ].nFmax)
+	{
+		ret = CalData[iZ].PHarray[CalData[iZ].nFmax - CalData[iZ].nFmin - 1].k * PH + CalData[iZ].PHarray[CalData[iZ].nFmax - CalData[iZ].nFmin - 1].b;
+		return ret;
+	}
+	else
+	{
+		freq_index = freq_index - CalData[iZ].nFmin;
+		//Теперь freq_index - индекс нижней частоты частотного отрезка, калибровочной нагрузки  который содержит зимерительную часоту freq.
+		ret = CalData[iZ].PHarray[freq_index].k * PH + CalData[iZ].PHarray[freq_index].b;
+		return ret;
+	}
+}
 
 /*********************************************************************//**
 * @brief        	Функция измеряет модуль импеданса и обрабатывает полученное значение с использованием калибровочных
@@ -913,25 +1024,19 @@ void Measure(float results[2], uint16_t freq)
 	
 	uint32_t temp_adc;
 
-	float f_coef, z_coef_1, z_coef_2;
+	float f_coef, z_coef_1, z_coef_2, ph_coef_1, ph_coef_2;
 	
 	float Zmin_on_cur_F, Zmax_on_cur_F;
-	
 	struct IndZwith_uint_Z_str * pIndZwith_uint_Z;
-	
 	float ZcalOnLowFreqLowIndex, ZcalOnLowFreqHighIndex, ZcalOnHighFreqLowIndex, ZcalOnHighFreqHighIndex;
 	float ZmeasuredOnLowFreqLowIndex, ZmeasuredOnLowFreqHighIndex, ZmeasuredOnHighFreqLowIndex, ZmeasuredOnHighFreqHighIndex;
-	
 	float PHcalOnLowFreqLowIndex, PHcalOnLowFreqHighIndex, PHcalOnHighFreqLowIndex, PHcalOnHighFreqHighIndex;
 	float PHmeasuredOnLowFreqLowIndex, PHmeasuredOnLowFreqHighIndex, PHmeasuredOnHighFreqLowIndex, PHmeasuredOnHighFreqHighIndex;
 	
 	pIndZwith_uint_Z = malloc(sizeof(struct IndZwith_uint_Z_str)*nZ_cal);
-	
 	temp_adc = ADC_RUN(os);
 	ph = (uint16_t)((temp_adc & 0xffff0000) >> 16);
 	mag = (uint16_t)(temp_adc & 0xffff);
-	//mag = 40780;
-	//ph = 8857;
 	
 	if (freq < cal_freq_list[nF_cal-1])
 	//Если текущая измерительная частота не равна максимальной калибровочной частоте
@@ -963,19 +1068,19 @@ void Measure(float results[2], uint16_t freq)
 		I_Zcal_max_2 = Calc_iZ_for_Max_Z_OnCur_iF(freq_index+1);
 		//I_Zcal_min_2 это индекс калибровочной нагрузки, показавшей максимальный импеданс на частоте с индексом freq_index+1
 		
-		Zmin_on_cur_F = GetCalZOn_iZ_iF(I_Zcal_min_1, freq_index) + ((int16_t)GetCalZOn_iZ_iF(I_Zcal_min_2, freq_index+1) - (int16_t)GetCalZOn_iZ_iF(I_Zcal_min_1, freq_index)) * (float)(freq - cal_freq_list[freq_index]) / (float)(cal_freq_list[freq_index+1] - cal_freq_list[freq_index]);
+		Zmin_on_cur_F = GetCalZ_on_iZ_iF(I_Zcal_min_1, freq_index) + ((int16_t)GetCalZ_on_iZ_iF(I_Zcal_min_2, freq_index+1) - (int16_t)GetCalZ_on_iZ_iF(I_Zcal_min_1, freq_index)) * (float)(freq - cal_freq_list[freq_index]) / (float)(cal_freq_list[freq_index+1] - cal_freq_list[freq_index]);
 
 		//Соединяем точки I_Zcal_min_1, freq_index и I_Zcal_min_2, freq_index+1 прямой, определяем значение этой линии
 		// на частоте freq (результат в единицах АЦП)
 		
-		Zmax_on_cur_F = GetCalZOn_iZ_iF(I_Zcal_max_1, freq_index) + ((int16_t)GetCalZOn_iZ_iF(I_Zcal_max_2, freq_index+1) - (int16_t)GetCalZOn_iZ_iF(I_Zcal_max_1, freq_index)) * ((float)(freq - cal_freq_list[freq_index])) / (float)(cal_freq_list[freq_index+1] - cal_freq_list[freq_index]);
+		Zmax_on_cur_F = GetCalZ_on_iZ_iF(I_Zcal_max_1, freq_index) + ((int16_t)GetCalZ_on_iZ_iF(I_Zcal_max_2, freq_index+1) - (int16_t)GetCalZ_on_iZ_iF(I_Zcal_max_1, freq_index)) * ((float)(freq - cal_freq_list[freq_index])) / (float)(cal_freq_list[freq_index+1] - cal_freq_list[freq_index]);
 		//Соединяем точки I_Zcal_max_1, freq_index и I_Zcal_max_2, freq_index+1 прямой, определяем значение этой линии
 		// на частоте freq (результат в единицах АЦП)
 		
 		if (mag >= Zmax_on_cur_F)
 		{
-			results[0] = GetZForF_iZ_Zmeasured(freq, I_Zcal_max_1, mag) * (1 - f_coef);
-			results[0] += GetZForF_iZ_Zmeasured(freq, I_Zcal_max_2, mag) * f_coef;
+			results[0] = GetRealZ_on_F_iZ_for_Z(freq, I_Zcal_max_1, mag) * (1 - f_coef);
+			results[0] += GetRealZ_on_F_iZ_for_Z(freq, I_Zcal_max_2, mag) * f_coef;
 			if (debug_mode==1)
 			{
 				printf("\nmag >= Zmax_on_cur_F, I_Zcal_max_1 = %u, I_Zcal_max_2 = %u", I_Zcal_max_1,I_Zcal_max_2);
@@ -983,8 +1088,8 @@ void Measure(float results[2], uint16_t freq)
 		}
 		else if (mag <= Zmin_on_cur_F)
 		{
-			results[0] = GetZForF_iZ_Zmeasured(freq, I_Zcal_min_1, mag) * (1 - f_coef);
-			results[0] += GetZForF_iZ_Zmeasured(freq, I_Zcal_min_2, mag) * f_coef;
+			results[0] = GetRealZ_on_F_iZ_for_Z(freq, I_Zcal_min_1, mag) * (1 - f_coef);
+			results[0] += GetRealZ_on_F_iZ_for_Z(freq, I_Zcal_min_2, mag) * f_coef;
 			if (debug_mode==1)
 			{
 				printf("\nmag <= Zmin_on_cur_F, I_Zcal_min_1 = %u, I_Zcal_min_2 = %u", I_Zcal_min_1, I_Zcal_min_2);
@@ -1011,12 +1116,12 @@ void Measure(float results[2], uint16_t freq)
 			//!!!!!!!!!!!!!Вот тут самы корректировка Среднее значение значений, откалиброванных по четырем точкам - частота выше,
 			//частота ниже, модуль импеданса выше и модуль импеданса ниже
 
-			// Сначала разберемся с модулем импеданса:
+// Сначала разберемся с модулем импеданса:
 			
-			ZcalOnLowFreqLowIndex = GetCalZOn_iZ_iF(pCorrectIndexes[0], freq_index);
-			ZcalOnLowFreqHighIndex = GetCalZOn_iZ_iF(pCorrectIndexes[1], freq_index);
-			ZcalOnHighFreqLowIndex = GetCalZOn_iZ_iF(pCorrectIndexes[0], freq_index+1);
-			ZcalOnHighFreqHighIndex = GetCalZOn_iZ_iF(pCorrectIndexes[1], freq_index+1);
+			ZcalOnLowFreqLowIndex = GetCalZ_on_iZ_iF(pCorrectIndexes[0], freq_index);
+			ZcalOnLowFreqHighIndex = GetCalZ_on_iZ_iF(pCorrectIndexes[1], freq_index);
+			ZcalOnHighFreqLowIndex = GetCalZ_on_iZ_iF(pCorrectIndexes[0], freq_index+1);
+			ZcalOnHighFreqHighIndex = GetCalZ_on_iZ_iF(pCorrectIndexes[1], freq_index+1);
 			
 			// Если измеренный импеданс находится между кривыми калибровочного импеданса с индексами 
 			// pCorrectIndexes[0] и pCorrectIndexes[1]
@@ -1094,10 +1199,10 @@ void Measure(float results[2], uint16_t freq)
 			// выше в функции GetCorrectIndexes. Определяестя расположение на частоте freq_index+1 - верхней частоте диапазона, в
 			// который попадает измерительная частота freq.
 			
-			ZmeasuredOnLowFreqLowIndex = GetZOn_iF_for_Z(freq_index, mag, pCorrectIndexes[0]);
-			ZmeasuredOnLowFreqHighIndex = GetZOn_iF_for_Z(freq_index, mag, pCorrectIndexes[1]);
-			ZmeasuredOnHighFreqLowIndex = GetZOn_iF_for_Z(freq_index+1, mag, pCorrectIndexes[0]);
-			ZmeasuredOnHighFreqHighIndex = GetZOn_iF_for_Z(freq_index+1, mag, pCorrectIndexes[1]);
+			ZmeasuredOnLowFreqLowIndex = GetRealZ_on_iF_iZ_for_Z(freq_index, mag, pCorrectIndexes[0]);
+			ZmeasuredOnLowFreqHighIndex = GetRealZ_on_iF_iZ_for_Z(freq_index, mag, pCorrectIndexes[1]);
+			ZmeasuredOnHighFreqLowIndex = GetRealZ_on_iF_iZ_for_Z(freq_index+1, mag, pCorrectIndexes[0]);
+			ZmeasuredOnHighFreqHighIndex = GetRealZ_on_iF_iZ_for_Z(freq_index+1, mag, pCorrectIndexes[1]);
 			
 			if (debug_mode==1)
 			{
@@ -1107,41 +1212,41 @@ void Measure(float results[2], uint16_t freq)
 				printf("\nZ_freq_index+1_pCorrectIndexes[1] = %f", ZmeasuredOnHighFreqHighIndex);
 			}
 			
-			results[0] = (1-f_coef) * ((1-z_coef_1)*GetZOn_iF_for_Z(freq_index, mag, pCorrectIndexes[0]) + z_coef_1*GetZOn_iF_for_Z(freq_index, mag, pCorrectIndexes[1])) + f_coef * ((1-z_coef_2)*GetZOn_iF_for_Z(freq_index+1, mag, pCorrectIndexes[0]) + z_coef_2 * GetZOn_iF_for_Z(freq_index+1, mag, pCorrectIndexes[1]));
+			results[0] = (1-f_coef) * ((1-z_coef_1)*GetRealZ_on_iF_iZ_for_Z(freq_index, mag, pCorrectIndexes[0]) + z_coef_1*GetRealZ_on_iF_iZ_for_Z(freq_index, mag, pCorrectIndexes[1])) + f_coef * ((1-z_coef_2)*GetRealZ_on_iF_iZ_for_Z(freq_index+1, mag, pCorrectIndexes[0]) + z_coef_2 * GetRealZ_on_iF_iZ_for_Z(freq_index+1, mag, pCorrectIndexes[1]));
 			
-			// Теперь обработаем фазу импеданса:
+// Теперь обработаем фазу импеданса:
 			
-			PHcalOnLowFreqLowIndex = GetCalZOn_iZ_iF(pCorrectIndexes[0], freq_index);
-			PHcalOnLowFreqHighIndex = GetCalZOn_iZ_iF(pCorrectIndexes[1], freq_index);
-			PHcalOnHighFreqLowIndex = GetCalZOn_iZ_iF(pCorrectIndexes[0], freq_index+1);
-			PHcalOnHighFreqHighIndex = GetCalZOn_iZ_iF(pCorrectIndexes[1], freq_index+1);
+			PHcalOnLowFreqLowIndex = GetCalPH_on_iZ_iF(pCorrectIndexes[0], freq_index);
+			PHcalOnLowFreqHighIndex = GetCalPH_on_iZ_iF(pCorrectIndexes[1], freq_index);
+			PHcalOnHighFreqLowIndex = GetCalPH_on_iZ_iF(pCorrectIndexes[0], freq_index+1);
+			PHcalOnHighFreqHighIndex = GetCalPH_on_iZ_iF(pCorrectIndexes[1], freq_index+1);
 			
 			// Если фаза измеренного импеданса находится между кривыми калибровочного импеданса с индексами 
 			// pCorrectIndexes[0] и pCorrectIndexes[1]
-			if ( ((ph>PHcalOnLowFreqLowIndex) && (mag<PHcalOnLowFreqHighIndex)) || ((mag<PHcalOnLowFreqLowIndex) && (mag>PHcalOnLowFreqHighIndex)) )
+			if ( ((ph>PHcalOnLowFreqLowIndex) && (ph<PHcalOnLowFreqHighIndex)) || ((ph<PHcalOnLowFreqLowIndex) && (ph>PHcalOnLowFreqHighIndex)) )
 			{
 				if (PHcalOnLowFreqHighIndex>PHcalOnLowFreqLowIndex)
 				{
-					z_coef_1 = (float)((int16_t)mag - (int16_t)PHcalOnLowFreqLowIndex) / (float)((int16_t)PHcalOnLowFreqHighIndex - (int16_t)PHcalOnLowFreqLowIndex);
+					ph_coef_1 = (float)((int16_t)ph - (int16_t)PHcalOnLowFreqLowIndex) / (float)((int16_t)PHcalOnLowFreqHighIndex - (int16_t)PHcalOnLowFreqLowIndex);
 				}
 				else
 				{
-					z_coef_1 = (float)((int16_t)mag - (int16_t)PHcalOnLowFreqHighIndex) / (float)((int16_t)PHcalOnLowFreqLowIndex - (int16_t)PHcalOnLowFreqHighIndex);
+					ph_coef_1 = (float)((int16_t)ph - (int16_t)PHcalOnLowFreqHighIndex) / (float)((int16_t)PHcalOnLowFreqLowIndex - (int16_t)PHcalOnLowFreqHighIndex);
 				}
 				if (debug_mode==1)
 				{
-					printf("\nz_coef_1 = %f", z_coef_1);
+					printf("\nph_coef_1 = %f", z_coef_1);
 				}
 			}
 			
 			// Если mag за границой кривой pCorrectIndexes[1]
-			else if (abs(mag-PHcalOnLowFreqLowIndex) > abs(mag-PHcalOnLowFreqHighIndex))
+			else if (abs(ph-PHcalOnLowFreqLowIndex) > abs(ph-PHcalOnLowFreqHighIndex))
 			{
 				if (debug_mode==1)
 				{
-					printf("\nz_coef_1 = 1");
+					printf("\nph_coef_1 = 1");
 				}
-				z_coef_1 = 1;
+				ph_coef_1 = 1;
 			}
 			
 			// Иначе (если mag за границой кривой pCorrectIndexes[0])
@@ -1149,63 +1254,63 @@ void Measure(float results[2], uint16_t freq)
 			{
 				if (debug_mode==1)
 				{
-					printf("\nz_coef_1 = 0");
+					printf("\nph_coef_1 = 0");
 				}
-				z_coef_1 = 0;
+				ph_coef_1 = 0;
 			}
-			// z_coef_1 - коэффициент, определяющий расположение модуля mag измеренного импеданса между ближайшими кривыми (найденными
+			// ph_coef_1 - коэффициент, определяющий расположение фазы ph измеренного импеданса между ближайшими кривыми (найденными
 			// выше в функции GetCorrectIndexes. Определяестя расположение на частоте freq_index - нижней частоте диапазона, в
 			// который попадает измерительная частота freq.
 			
-			if ( ((mag>PHcalOnHighFreqLowIndex) && (mag<PHcalOnHighFreqHighIndex)) || ((mag<PHcalOnHighFreqLowIndex) && (mag>PHcalOnHighFreqHighIndex)) )
+			if ( ((ph>PHcalOnHighFreqLowIndex) && (ph<PHcalOnHighFreqHighIndex)) || ((ph<PHcalOnHighFreqLowIndex) && (ph>PHcalOnHighFreqHighIndex)) )
 			{
 				if (PHcalOnHighFreqHighIndex>PHcalOnHighFreqLowIndex)
 				{
-					z_coef_2 = (float)((int16_t)mag - (int16_t)PHcalOnHighFreqLowIndex) / (float)((int16_t)PHcalOnHighFreqHighIndex - (int16_t)PHcalOnHighFreqLowIndex);
+					ph_coef_2 = (float)((int16_t)ph - (int16_t)PHcalOnHighFreqLowIndex) / (float)((int16_t)PHcalOnHighFreqHighIndex - (int16_t)PHcalOnHighFreqLowIndex);
 				}
 				else
 				{
-					z_coef_2 = (float)((int16_t)mag - (int16_t)PHcalOnHighFreqHighIndex) / (float)((int16_t)PHcalOnHighFreqLowIndex - (int16_t)PHcalOnHighFreqHighIndex);
+					ph_coef_2 = (float)((int16_t)ph - (int16_t)PHcalOnHighFreqHighIndex) / (float)((int16_t)PHcalOnHighFreqLowIndex - (int16_t)PHcalOnHighFreqHighIndex);
 				}
 				if (debug_mode==1)
 				{
-					printf("\nz_coef_2 = %f", z_coef_2);
+					printf("\nph_coef_2 = %f", ph_coef_2);
 				}
 			}
-			else if (abs(mag-PHcalOnHighFreqLowIndex) > abs(mag-PHcalOnHighFreqHighIndex))
+			else if (abs(ph-PHcalOnHighFreqLowIndex) > abs(ph-PHcalOnHighFreqHighIndex))
 			{
 				if (debug_mode==1)
 				{
-					printf("\nz_coef_2 = 1");
+					printf("\nph_coef_2 = 1");
 				}
-				z_coef_2 = 1;
+				ph_coef_2 = 1;
 			}
 			else
 			{
 				if (debug_mode==1)
 				{
-					printf("\nz_coef_2 = 0");
+					printf("\nph_coef_2 = 0");
 				}
-				z_coef_2 = 0;
+				ph_coef_2 = 0;
 			}
-			// z_coef_2 - коэффициент, определяющий расположение модуля mag измеренного импеданса между ближайшими кривыми (найденными
+			// ph_coef_2 - коэффициент, определяющий расположение фазы ph измеренного импеданса между ближайшими кривыми (найденными
 			// выше в функции GetCorrectIndexes. Определяестя расположение на частоте freq_index+1 - верхней частоте диапазона, в
 			// который попадает измерительная частота freq.
 			
-			PHmeasuredOnLowFreqLowIndex = GetZOn_iF_for_Z(freq_index, mag, pCorrectIndexes[0]);
-			PHmeasuredOnLowFreqHighIndex = GetZOn_iF_for_Z(freq_index, mag, pCorrectIndexes[1]);
-			PHmeasuredOnHighFreqLowIndex = GetZOn_iF_for_Z(freq_index+1, mag, pCorrectIndexes[0]);
-			PHmeasuredOnHighFreqHighIndex = GetZOn_iF_for_Z(freq_index+1, mag, pCorrectIndexes[1]);
+			PHmeasuredOnLowFreqLowIndex = GetRealPH_on_iF_iZ_for_PH(freq_index, ph, pCorrectIndexes[0]);
+			PHmeasuredOnLowFreqHighIndex = GetRealPH_on_iF_iZ_for_PH(freq_index, ph, pCorrectIndexes[1]);
+			PHmeasuredOnHighFreqLowIndex = GetRealPH_on_iF_iZ_for_PH(freq_index+1, ph, pCorrectIndexes[0]);
+			PHmeasuredOnHighFreqHighIndex = GetRealPH_on_iF_iZ_for_PH(freq_index+1, ph, pCorrectIndexes[1]);
 			
 			if (debug_mode==1)
 			{
-				printf("\nZ_freq_index_pCorrectIndexes[0] = %f", PHmeasuredOnLowFreqLowIndex);
-				printf("\nZ_freq_index_pCorrectIndexes[1] = %f", PHmeasuredOnLowFreqHighIndex);
-				printf("\nZ_freq_index+1_pCorrectIndexes[0] = %f", PHmeasuredOnHighFreqLowIndex);
-				printf("\nZ_freq_index+1_pCorrectIndexes[1] = %f", PHmeasuredOnHighFreqHighIndex);
+				printf("\nPH_freq_index_pCorrectIndexes[0] = %f", PHmeasuredOnLowFreqLowIndex);
+				printf("\nPH_freq_index_pCorrectIndexes[1] = %f", PHmeasuredOnLowFreqHighIndex);
+				printf("\nPH_freq_index+1_pCorrectIndexes[0] = %f", PHmeasuredOnHighFreqLowIndex);
+				printf("\nPH_freq_index+1_pCorrectIndexes[1] = %f", PHmeasuredOnHighFreqHighIndex);
 			}
 			
-			results[1] = (1-f_coef) * ((1-z_coef_1)*GetZOn_iF_for_Z(freq_index, mag, pCorrectIndexes[0]) + z_coef_1*GetZOn_iF_for_Z(freq_index, mag, pCorrectIndexes[1])) + f_coef * ((1-z_coef_2)*GetZOn_iF_for_Z(freq_index+1, mag, pCorrectIndexes[0]) + z_coef_2 * GetZOn_iF_for_Z(freq_index+1, mag, pCorrectIndexes[1]));
+			results[1] = (1-f_coef) * ((1-ph_coef_1)*GetRealPH_on_iF_iZ_for_PH(freq_index, ph, pCorrectIndexes[0]) + ph_coef_1*GetRealPH_on_iF_iZ_for_PH(freq_index, ph, pCorrectIndexes[1])) + f_coef * ((1-ph_coef_2)*GetRealPH_on_iF_iZ_for_PH(freq_index+1, ph, pCorrectIndexes[0]) + ph_coef_2 * GetRealPH_on_iF_iZ_for_PH(freq_index+1, ph, pCorrectIndexes[1]));
 		}
 	}
 	else
@@ -1220,19 +1325,19 @@ void Measure(float results[2], uint16_t freq)
 		I_Zcal_max_1 = Calc_iZ_for_Max_Z_OnCur_iF(freq_index);
 		//I_Zcal_min_1 это индекс калибровочной нагрузки, показавшей максимальный импеданс на частоте с индексом freq_index
 		
-		Zmin_on_cur_F = GetCalZOn_iZ_iF(I_Zcal_min_1, freq_index);
+		Zmin_on_cur_F = GetCalZ_on_iZ_iF(I_Zcal_min_1, freq_index);
 		//Zmin_on_cur_F это минимальное значение АЦП, полученное при калибровке на максимальной частоте.
 		
-		Zmax_on_cur_F = GetCalZOn_iZ_iF(I_Zcal_max_1, freq_index);
+		Zmax_on_cur_F = GetCalZ_on_iZ_iF(I_Zcal_max_1, freq_index);
 		//Zmax_on_cur_F это максимальное значение АЦП, полученное при калибровке на максимальной частоте.
 		
 		if (mag >= Zmax_on_cur_F)
 		{
-			results[0] = GetZForF_iZ_Zmeasured(freq, I_Zcal_max_1, mag);
+			results[0] = GetRealZ_on_F_iZ_for_Z(freq, I_Zcal_max_1, mag);
 		}
 		else if (mag <= Zmin_on_cur_F)
 		{
-			results[0] = GetZForF_iZ_Zmeasured(freq, I_Zcal_min_1, mag);
+			results[0] = GetRealZ_on_F_iZ_for_Z(freq, I_Zcal_min_1, mag);
 		}
 		else	//Если существует такая калибровочная нагрузка, которая на текущей частоте имеет меньший импеданс,
 					// чем mag, и такая калибровочная нагрузка, которая на текущей частоте имеет больший импеданс, чем mag.
@@ -1243,7 +1348,7 @@ void Measure(float results[2], uint16_t freq)
 			//!!!!!!!!!!!!!Вот тут самы корректировка. Среднее значение значений, откалиброванных по двум точкам:
 			//модуль импеданса выше и модуль импеданса ниже
 			
-			z_coef_1 = (mag - GetCalZOn_iZ_iF(pCorrectIndexes[0], freq_index)) / (GetCalZOn_iZ_iF(pCorrectIndexes[1], freq_index) - GetCalZOn_iZ_iF(pCorrectIndexes[0], freq_index));
+			z_coef_1 = (mag - GetCalZ_on_iZ_iF(pCorrectIndexes[0], freq_index)) / (GetCalZ_on_iZ_iF(pCorrectIndexes[1], freq_index) - GetCalZ_on_iZ_iF(pCorrectIndexes[0], freq_index));
 			// z_coef_1 - коэффициент, определяющий расположение модуля mag измеренного импеданса между ближайшими кривыми (найденными
 			// выше в функции GetCorrectIndexes. Определяестя расположение на частоте freq_index - нижней частоте диапазона, в
 			// который попадает измерительная частота freq.
@@ -1309,28 +1414,12 @@ float GetSumOtkl(float mag, float ph, uint16_t freq, uint8_t n_cal)
 	{
 		freq_index--;
 	}
-	cal = GetCalZOn_iZ_F (n_cal, freq);
+	cal = GetCalZ_on_F_iZ (n_cal, freq);
 	ret = fabs((cal-mag)/((float)mag));
-	cal = GetPHOn_F_for_iZ (freq, freq_index, n_cal);
+	cal = GetCalPH_on_F_iZ (n_cal, freq);
 	cal = fabs((cal-ph)/((float)ph));
 	ret = ret + cal/5; // Уменьшаем чувствительность суммы модулей отклонений от фазы
 	return ret;
-}
-
-uint32_t GetCalZOn_iZ_iF (uint8_t iZ, uint8_t iF)
-{
-	if (iF <= CalData[iZ].nFmin)
-	{
-		return CalData[iZ].gZmax;
-	}
-	else if (iF >= CalData[iZ].nFmax)
-	{
-		return CalData[iZ].gZmin;
-	}
-	else
-	{
-		return CalData[iZ].Zarray[iF - CalData[iZ].nFmin - 1].Zmin;
-	}
 }
 
 
@@ -1345,47 +1434,6 @@ void wait(uint32_t t)
 	while (t>0)
 	{
 		t--;
-	}
-}
-
-/*********************************************************************//**
-* @brief        	Функция рассчитывает значение модуля импеданса по данным калибровочной нагрузки iZ на частоте freq
-									при измеренном импеданса Zmeasured
-	@param[freq]		Частота, кГц
-	@param[iZ]			Индекс калибровочной нагрузки
-	@param[Zmeasured]		Измеренный импеданс, ед. АЦП
-* @return       	Реальное значение модуля измеренного импеданса
-**********************************************************************/
-float GetZForF_iZ_Zmeasured(uint16_t freq, uint8_t iZ, uint16_t Zmeasured)
-{
-	uint8_t freq_index = 0;
-	float ret;
-	
-	while (cal_freq_list[freq_index] < freq)
-	{
-		freq_index++;
-	}
-	if (freq_index != 0)
-	{
-		freq_index--;
-	}
-	//Теперь freq_index - индекс нижней частоты частотного отрезка, который содержит зимерительную часоту freq.
-	if (freq_index < CalData[iZ].nFmin)
-	{
-		ret = CalData[iZ].Zarray[0].k * Zmeasured + CalData[iZ].Zarray[0].b;
-		return ret;
-	}
-	else if (freq_index >= CalData[iZ].nFmax)
-	{
-		ret = CalData[iZ].Zarray[CalData[iZ].nFmax - CalData[iZ].nFmin - 1].k * Zmeasured + CalData[iZ].Zarray[CalData[iZ].nFmax - CalData[iZ].nFmin - 1].b;
-		return ret;
-	}
-	else
-	{
-		freq_index = freq_index - CalData[iZ].nFmin;
-		//Теперь freq_index - индекс нижней частоты частотного отрезка, калибровочной нагрузки  который содержит зимерительную часоту freq.
-		ret = CalData[iZ].Zarray[freq_index].k * Zmeasured + CalData[iZ].Zarray[freq_index].b;
-		return ret;
 	}
 }
 

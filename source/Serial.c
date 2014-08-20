@@ -122,6 +122,8 @@ void UART0_IRQHandler(void)
 					Measure(results, frequency);
 					printf("\n Magnitude of impedance is: ");
 					printf("%.1f Ohm.", results[0]);
+					printf("\n Phase of impedance is: ");
+					printf("%.2f graduses.", results[1]*57.295779513);
 					printf("\nType next command.\n>");
 					UART_pressed_enter = 0;
 				}

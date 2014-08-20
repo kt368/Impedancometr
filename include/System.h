@@ -90,8 +90,6 @@ struct PrepareStructForZcal_str {
 	uint16_t	RamSize;
 };
 
-float GetCalZOn_iZ_F (uint8_t iZ, uint16_t freq);
-uint32_t GetCalZOn_iZ_iF (uint8_t iZ, uint8_t iF);
 
 int compare_structs_on_uint_Z_and_iZ(const void *arg1, const void *arg2);
 int compare_structs_on_float_Z_and_iZ(const void *arg1, const void *arg2);
@@ -100,10 +98,20 @@ void Measure(float results[2], uint16_t freq);
 
 void GetCorrectIndexes(uint8_t* pCorrectIndexes, uint16_t freq, float mag, float ph);
 float GetSumOtkl(float mag, float ph, uint16_t freq, uint8_t n_cal);
-float GetPHOn_F_for_iZ (uint16_t freq, uint8_t i_F_min, uint8_t iZ);
-float GetZForF_iZ_Zmeasured(uint16_t freq, uint8_t iZ, uint16_t Zmeasured);
+
+uint32_t GetCalZ_on_iZ_iF (uint8_t iZ, uint8_t iF);
+uint32_t GetCalPH_on_iZ_iF (uint8_t iZ, uint8_t iF);
+
+float GetCalZ_on_F_iZ (uint8_t iZ, uint16_t freq);
+float GetCalPH_on_F_iZ (uint8_t iZ, uint16_t freq);
+
+float GetRealZ_on_F_iZ_for_Z(uint16_t freq, uint8_t iZ, uint16_t Z);
+float GetRealZ_on_iF_iZ_for_Z (uint8_t freq_index, uint16_t Z, uint8_t iZ);
+
+float GetRealPH_on_F_iZ_for_Z(uint16_t freq, uint8_t iZ, uint16_t PH);
+float GetRealPH_on_iF_iZ_for_PH (uint8_t freq_index, uint16_t PH, uint8_t iZ);
+
 void wait (uint32_t t);
-float GetZOn_iF_for_Z (uint8_t freq_index, uint16_t Z, uint8_t iZ);
 struct PrepareStructForZcal_str GetPrepareStructForZcal (void);
 
 extern void AD9833_SPI_Init(void);

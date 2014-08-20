@@ -253,7 +253,7 @@ extern uint8_t pCorrectIndexes[2];
 		{
 				printf("\n\nImpedance vs frequency data:");
 				printf("\nFrequency\tMagnitude\tPhase");
-				printf("\nkHz\t\tOhm\t\tdegree\n\n");
+				printf("\nkHz\t\tOhm\t\tdegree\n");
 				for (i_F = 0; i_F < n_F; i_F++)
 				{
 					frequency = (f_min+(uint32_t)(f_max-f_min)*(uint32_t)i_F/n_F);
@@ -263,7 +263,7 @@ extern uint8_t pCorrectIndexes[2];
 					Measure(results, frequency);
 					printf("\n%6u\t\t", frequency);
 					printf("%6.1f\t\t", results[0]);
-					printf("%6.1f", results[1]);
+					printf("%6.2f\t\t", results[1]*57.295779513);
 					printf("%5u", sdvig);
 					printf("%5u", pCorrectIndexes[0]);
 					printf("%5u", pCorrectIndexes[1]);
