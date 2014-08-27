@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\AD8302.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\AD8302.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5040049: Last Updated: Wed Aug 20 23:35:18 2014
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5040049: Last Updated: Wed Aug 27 22:50:17 2014
 <BR><P>
 <H3>Maximum Stack Usage =        664 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1163,13 +1163,13 @@ Global Symbols
 <BR><BR>[Calls]<UL><LI><a href="#[64]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;check_failed
 </UL>
 
-<P><STRONG><a name="[c9]"></a>CheckAndStoreCalData</STRONG> (Thumb, 118 bytes, Stack size 72 bytes, flash_save_read.o(.text))
+<P><STRONG><a name="[c9]"></a>CheckAndStoreCalData</STRONG> (Thumb, 216 bytes, Stack size 72 bytes, flash_save_read.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = CheckAndStoreCalData
 </UL>
 <BR>[Called By]<UL><LI><a href="#[c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SaveCalData
 </UL>
 
-<P><STRONG><a name="[c8]"></a>SaveCalData</STRONG> (Thumb, 1254 bytes, Stack size 72 bytes, flash_save_read.o(.text))
+<P><STRONG><a name="[c8]"></a>SaveCalData</STRONG> (Thumb, 1160 bytes, Stack size 72 bytes, flash_save_read.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 144<LI>Call Chain = SaveCalData &rArr; CheckAndStoreCalData
 </UL>
 <BR>[Calls]<UL><LI><a href="#[c9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CheckAndStoreCalData
@@ -1177,7 +1177,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[d3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Calibration
 </UL>
 
-<P><STRONG><a name="[108]"></a>LoadCalData</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, flash_save_read.o(.text))
+<P><STRONG><a name="[108]"></a>LoadCalData</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, flash_save_read.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[d3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Calibration
 </UL>
 
@@ -1375,7 +1375,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[d3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Calibration
 </UL>
 
-<P><STRONG><a name="[d3]"></a>Calibration</STRONG> (Thumb, 3198 bytes, Stack size 96 bytes, system.o(.text))
+<P><STRONG><a name="[d3]"></a>Calibration</STRONG> (Thumb, 3194 bytes, Stack size 96 bytes, system.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 416 + Unknown Stack Size
 <LI>Call Chain = Calibration &rArr; ADC_RUN &rArr; pow &rArr; sqrt &rArr; _dsqrt &rArr; __fpl_dnaninf
 </UL>
@@ -1388,7 +1388,6 @@ Global Symbols
 <LI><a href="#[c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SaveCalData
 <LI><a href="#[eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fmul
 <LI><a href="#[d7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ui2f
-<LI><a href="#[f5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2f
 <LI><a href="#[105]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2uiz
 <LI><a href="#[d9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fdiv
 <LI><a href="#[106]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fsub
@@ -2719,7 +2718,6 @@ Global Symbols
 <P><STRONG><a name="[f5]"></a>__aeabi_i2f</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, fflt_clz.o(x$fpl$fflt))
 <BR><BR>[Called By]<UL><LI><a href="#[f0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;logspace
 <LI><a href="#[dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Measure
-<LI><a href="#[d3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Calibration
 <LI><a href="#[fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;powf
 <LI><a href="#[f1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;log10f
 </UL>

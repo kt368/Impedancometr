@@ -17,8 +17,8 @@
 
 #define LOW									0
 #define HIGH								1
-#define nF_cal							20
-#define nZ_cal_max					200
+#define nF_cal							27
+#define nZ_cal_max					1000
 
 #define CalData_var					1
 

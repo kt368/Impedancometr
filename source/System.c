@@ -4,8 +4,8 @@
 mag_ph_calc_calibr_struct_t MagPhcT_st;
 
 // Calibration frequency list in kHz
-uint32_t cal_freq_list[nF_cal] = { 10, 15, 20, 30, 50, 75, 100, 150, 200, 300, 400, 500, 700, 1000, 1400, 1900,\
-																		2500, 3200, 4000, 5000 };
+uint32_t cal_freq_list[nF_cal] = { 10, 15, 20, 30, 40, 60, 80, 100, 120, 140, 160, 180, 200, 250, 300, 350, 400, 450, 500, 700, 1000,\
+																		1400, 1900, 2500, 3200, 4000, 5000 };
 																	 
 uint32_t C=0;
 uint32_t Rt = 10;
@@ -62,9 +62,9 @@ uint8_t pCorrectIndexes[2] = {0, 0};
 		uint32_t temp = 0, temp2 = 0, temp3 = 0, temp4, temp5, adc_abs_counter=0, adc_ph_counter=0;
 		
 		//Измерение необходимого сдвига PCM сигнала - он почему-то плавает
-		for (sdvig=3;sdvig<15;sdvig++)
+		for (sdvig=5;sdvig<9;sdvig++)
 		{
-			for (j=0;j<64;j++)
+			for (j=0;j<32;j++)
 			{
 				while (I2S_complete == 0){};
 				i2s_fifo_buf[0]=i2s_fifo[0];
@@ -280,19 +280,20 @@ uint8_t pCorrectIndexes[2] = {0, 0};
 
 PT_THREAD(Calibration(struct pt *pt))
 {
-	uint8_t freq_counter;
+	uint_fast8_t freq_counter;
 	
-	uint16_t mag_x_1;
-	uint16_t ph_x_1;
-	uint16_t mag_x_2;
-	uint16_t ph_x_2;
-	uint32_t temp_adc;
+	uint_fast16_t mag_x_1;
+	uint_fast16_t ph_x_1;
+	uint_fast16_t mag_x_2;
+	uint_fast16_t ph_x_2;
+	uint_fast32_t temp_adc;
 	
 	float mag_y_1;
 	float ph_y_1;
 	float mag_y_2;
 	float ph_y_2;
-	uint8_t temp, temp2, temp3;
+	uint_fast8_t temp2, temp3;
+	uint_fast16_t temp;
 	
 //declaration of external struct
 	extern mag_ph_calc_calibr_struct_t MagPhcT_st;
@@ -309,7 +310,7 @@ PT_THREAD(Calibration(struct pt *pt))
 	extern int uart_rcv_len_cnt;
 	extern char c;
 	extern uint8_t UART_pressed_enter;
-	static uint8_t CalZCounter;
+	static uint16_t CalZCounter;
 	struct PrepareStructForZcal_str PrepareStructForZcal;
 	static uint8_t AllowSaveFlag=0;
 	
@@ -1468,7 +1469,7 @@ struct PrepareStructForZcal_str GetPrepareStructForZcal (void)
 		Xc = 1/(2*3.1415926*freq*C*0.000000000001);
 		
 		//Определение минимальной подходящей частоты
-		if ( ( (magnitude < 1200) && (Xc < (20 * Rp) ) ) || (C == 0) )	// if Zc<6*Rp or C=0
+		if ( ( (magnitude < 1500) && (Xc < (200 * Rp) ) ) || (C == 0) )	// if Zc<200*Rp or C=0
 		{
 			if (first==1)
 			{
