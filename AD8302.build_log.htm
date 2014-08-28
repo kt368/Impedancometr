@@ -7,6 +7,54 @@ D:\Documents\Dropbox\Impedancometr\AD8302.uvproj
 Project File Date:  08/27/2014
 
 <h2>Output:</h2>
+Build target 'LPC1758'
+compiling System.c...
+source\System.c(62): warning:  #177-D: variable "temp" was declared but never referenced
+                uint32_t temp = 0, temp2 = 0, temp3 = 0, temp4, temp5, adc_abs_counter=0, adc_ph_counter=0;
+source\System.c(62): warning:  #550-D: variable "temp4" was set but never used
+                uint32_t temp = 0, temp2 = 0, temp3 = 0, temp4, temp5, adc_abs_counter=0, adc_ph_counter=0;
+source\System.c(62): warning:  #550-D: variable "temp5" was set but never used
+                uint32_t temp = 0, temp2 = 0, temp3 = 0, temp4, temp5, adc_abs_counter=0, adc_ph_counter=0;
+source\System.c(317): warning:  #550-D: variable "PT_YIELD_FLAG" was set but never used
+        PT_BEGIN(pt);
+source\System.c(295): warning:  #177-D: variable "temp3" was declared but never referenced
+        uint8_t temp2, temp3;
+source\System.c: 5 warnings, 0 errors
+linking...
+Program Size: Code=51028 RO-data=2164 RW-data=364 ZI-data=59580  
+".\AD8302.axf" - 0 Error(s), 5 Warning(s).
+Load "D:\\Documents\\Dropbox\\Impedancometr\\AD8302.axf" 
+Set JLink Project File to "D:\Documents\Dropbox\Impedancometr\JLinkSettings.ini"
+* JLink Info: Device "LPC1758" selected (512 KB flash, 32 KB RAM).
+ 
+JLink info:
+------------
+DLL: V4.88 , compiled Jul 15 2014 08:50:40
+Firmware: J-Link ARM V8 compiled Nov 25 2013 19:20:08
+Hardware: V8.00
+S/N : 158005115 
+ 
+* JLink Info: TotalIRLen = 4, IRPrint = 0x01
+* JLink Info: Found Cortex-M3 r2p0, Little endian.
+* JLink Info: FPUnit: 6 code (BP) slots and 2 literal slots
+* JLink Info: TPIU fitted.
+* JLink Info: ETM fitted.
+ROMTableAddr = 0xE00FF003
+ 
+Target info:
+------------
+Device: LPC1758
+VTarget = 3.313V
+State of Pins: 
+TCK: 1, TDI: 0, TDO: 1, TMS: 0, TRES: 1, TRST: 1
+Hardware-Breakpoints: 6
+Software-Breakpoints: 8192
+Watchpoints:          4
+JTAG speed: 9600 kHz
+ 
+Erase Done.
+Programming Done.
+Verify OK.
 </pre>
 </body>
 </html>

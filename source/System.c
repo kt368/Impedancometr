@@ -282,18 +282,18 @@ PT_THREAD(Calibration(struct pt *pt))
 {
 	uint_fast8_t freq_counter;
 	
-	uint_fast16_t mag_x_1;
-	uint_fast16_t ph_x_1;
-	uint_fast16_t mag_x_2;
-	uint_fast16_t ph_x_2;
-	uint_fast32_t temp_adc;
+	uint16_t mag_x_1;
+	uint16_t ph_x_1;
+	uint16_t mag_x_2;
+	uint16_t ph_x_2;
+	uint32_t temp_adc;
 	
 	float mag_y_1;
 	float ph_y_1;
 	float mag_y_2;
 	float ph_y_2;
-	uint_fast8_t temp2, temp3;
-	uint_fast16_t temp;
+	uint8_t temp2, temp3;
+	uint16_t temp;
 	
 //declaration of external struct
 	extern mag_ph_calc_calibr_struct_t MagPhcT_st;
