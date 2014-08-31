@@ -1128,14 +1128,14 @@ void Measure(float results[2], uint16_t freq)
 			// pCorrectIndexes[0] è pCorrectIndexes[1]
 			if ( ((mag>ZcalOnLowFreqLowIndex) && (mag<ZcalOnLowFreqHighIndex)) || ((mag<ZcalOnLowFreqLowIndex) && (mag>ZcalOnLowFreqHighIndex)) )
 			{
-				if (ZcalOnLowFreqHighIndex>ZcalOnLowFreqLowIndex)
-				{
+//				if (ZcalOnLowFreqHighIndex>ZcalOnLowFreqLowIndex)
+//				{
 					z_coef_1 = (float)((int16_t)mag - (int16_t)ZcalOnLowFreqLowIndex) / (float)((int16_t)ZcalOnLowFreqHighIndex - (int16_t)ZcalOnLowFreqLowIndex);
-				}
-				else
-				{
-					z_coef_1 = (float)((int16_t)mag - (int16_t)ZcalOnLowFreqHighIndex) / (float)((int16_t)ZcalOnLowFreqLowIndex - (int16_t)ZcalOnLowFreqHighIndex);
-				}
+//				}
+//				else
+//				{
+//					z_coef_1 = (float)((int16_t)mag - (int16_t)ZcalOnLowFreqHighIndex) / (float)((int16_t)ZcalOnLowFreqLowIndex - (int16_t)ZcalOnLowFreqHighIndex);
+//				}
 				if (debug_mode==1)
 				{
 					printf("\nz_coef_1 = %f", z_coef_1);
@@ -1167,14 +1167,14 @@ void Measure(float results[2], uint16_t freq)
 			
 			if ( ((mag>ZcalOnHighFreqLowIndex) && (mag<ZcalOnHighFreqHighIndex)) || ((mag<ZcalOnHighFreqLowIndex) && (mag>ZcalOnHighFreqHighIndex)) )
 			{
-				if (ZcalOnHighFreqHighIndex>ZcalOnHighFreqLowIndex)
-				{
+//				if (ZcalOnHighFreqHighIndex>ZcalOnHighFreqLowIndex)
+//				{
 					z_coef_2 = (float)((int16_t)mag - (int16_t)ZcalOnHighFreqLowIndex) / (float)((int16_t)ZcalOnHighFreqHighIndex - (int16_t)ZcalOnHighFreqLowIndex);
-				}
-				else
-				{
-					z_coef_2 = (float)((int16_t)mag - (int16_t)ZcalOnHighFreqHighIndex) / (float)((int16_t)ZcalOnHighFreqLowIndex - (int16_t)ZcalOnHighFreqHighIndex);
-				}
+//				}
+//				else
+//				{
+//					z_coef_2 = (float)((int16_t)mag - (int16_t)ZcalOnHighFreqHighIndex) / (float)((int16_t)ZcalOnHighFreqLowIndex - (int16_t)ZcalOnHighFreqHighIndex);
+//				}
 				if (debug_mode==1)
 				{
 					printf("\nz_coef_2 = %f", z_coef_2);
@@ -1226,14 +1226,14 @@ void Measure(float results[2], uint16_t freq)
 			// pCorrectIndexes[0] è pCorrectIndexes[1]
 			if ( ((ph>PHcalOnLowFreqLowIndex) && (ph<PHcalOnLowFreqHighIndex)) || ((ph<PHcalOnLowFreqLowIndex) && (ph>PHcalOnLowFreqHighIndex)) )
 			{
-				if (PHcalOnLowFreqHighIndex>PHcalOnLowFreqLowIndex)
-				{
+//				if (PHcalOnLowFreqHighIndex>PHcalOnLowFreqLowIndex)
+//				{
 					ph_coef_1 = (float)((int16_t)ph - (int16_t)PHcalOnLowFreqLowIndex) / (float)((int16_t)PHcalOnLowFreqHighIndex - (int16_t)PHcalOnLowFreqLowIndex);
-				}
-				else
-				{
-					ph_coef_1 = (float)((int16_t)ph - (int16_t)PHcalOnLowFreqHighIndex) / (float)((int16_t)PHcalOnLowFreqLowIndex - (int16_t)PHcalOnLowFreqHighIndex);
-				}
+//				}
+//				else
+//				{
+//					ph_coef_1 = (float)((int16_t)ph - (int16_t)PHcalOnLowFreqHighIndex) / (float)((int16_t)PHcalOnLowFreqLowIndex - (int16_t)PHcalOnLowFreqHighIndex);
+//				}
 				if (debug_mode==1)
 				{
 					printf("\nph_coef_1 = %f", z_coef_1);
@@ -1265,14 +1265,14 @@ void Measure(float results[2], uint16_t freq)
 			
 			if ( ((ph>PHcalOnHighFreqLowIndex) && (ph<PHcalOnHighFreqHighIndex)) || ((ph<PHcalOnHighFreqLowIndex) && (ph>PHcalOnHighFreqHighIndex)) )
 			{
-				if (PHcalOnHighFreqHighIndex>PHcalOnHighFreqLowIndex)
-				{
+//				if (PHcalOnHighFreqHighIndex>PHcalOnHighFreqLowIndex)
+//				{
 					ph_coef_2 = (float)((int16_t)ph - (int16_t)PHcalOnHighFreqLowIndex) / (float)((int16_t)PHcalOnHighFreqHighIndex - (int16_t)PHcalOnHighFreqLowIndex);
-				}
-				else
-				{
-					ph_coef_2 = (float)((int16_t)ph - (int16_t)PHcalOnHighFreqHighIndex) / (float)((int16_t)PHcalOnHighFreqLowIndex - (int16_t)PHcalOnHighFreqHighIndex);
-				}
+//				}
+//				else
+//				{
+//					ph_coef_2 = (float)((int16_t)ph - (int16_t)PHcalOnHighFreqHighIndex) / (float)((int16_t)PHcalOnHighFreqLowIndex - (int16_t)PHcalOnHighFreqHighIndex);
+//				}
 				if (debug_mode==1)
 				{
 					printf("\nph_coef_2 = %f", ph_coef_2);
