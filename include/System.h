@@ -51,19 +51,15 @@
 // Types definitions
 
 typedef struct {float mag; float ph; uint32_t freq;} mag_ph_calc_calibr_struct_t; // freq in Q8
-typedef struct {float k; float b; uint32_t Zmin;} Zarray_t;
-typedef struct {float k; float b; uint32_t PHmin;} PHarray_t;
+typedef struct {uint32_t mag; uint32_t ph;} Zarray_t;
 
 struct CalData_struct {	//Size 8*32 bit = 8*4 bytes = 32 byte
-	uint32_t 	gZmin;			//Global (for this calibrating object) minimum impedance, on which we were calibrated
-	uint32_t 	gZmax;			//Global (for this calibrating object) maximum impedance, on which we were calibrated
-	uint32_t 	gPHmin;
-	uint32_t	gPHmax;
-	uint32_t	nFmin;			//Index of first frequency, on wich impedance was succesfully calibrated
+	uint32_t	nFmin;			//Индекс первой калибровочной частоты
 	uint32_t	nFmax;			//Индекс +1 максимальной калибровочной частоты.
+	uint32_t	C;					//Калибровочный конденсатор (в пФ).
+	uint32_t	R;					//Калибровочный резистор, паралельный конденсатору (в Ом).
 	Zarray_t 	*Zarray;		//pointer to dynsmic size array of structs (n not necessarily equal nF)
-													//We have nFmax - nFmin sets of calibrating coefficients
-	PHarray_t	*PHarray;		//pointer to dynsmic size array of structs (n not necessarily equal nF)
+												//We have nFmax - nFmin sets of calibrating coefficients
 };
 
 struct IndZwith_uint_Z_str {uint16_t Z; uint8_t iZ;};
@@ -106,6 +102,7 @@ float GetCalZ_on_F_iZ (uint8_t iZ, uint16_t freq);
 float GetCalPH_on_F_iZ (uint8_t iZ, uint16_t freq);
 
 float GetRealZ_on_F_iZ_for_Z(uint16_t freq, uint8_t iZ, uint16_t Z);
+float GetRealZ_on_F_iZ1_iZ2_for_Z(uint16_t freq, uint8_t iZ1, uint8_t iZ2, uint16_t Z);
 float GetRealZ_on_iF_iZ_for_Z (uint8_t freq_index, uint16_t Z, uint8_t iZ);
 
 float GetRealPH_on_F_iZ_for_Z(uint16_t freq, uint8_t iZ, uint16_t PH);

@@ -20,6 +20,8 @@ volatile uint32_t DdsFreq;
 uint8_t debug_mode = 0, FirstCalStart = 1;
 uint16_t nZ_cal = 0;
 uint_fast8_t sdvig;
+uint8_t freq_index=0;		//Индекс калибровочной частоты, которая ближайшая к freq, но меньше нее
+float f_coef;
 
 struct CalData_struct* CalData;
 struct CalData_struct* CalDataCalibr;
@@ -282,16 +284,10 @@ PT_THREAD(Calibration(struct pt *pt))
 {
 	uint_fast8_t freq_counter;
 	
-	uint16_t mag_x_1;
-	uint16_t ph_x_1;
-	uint16_t mag_x_2;
-	uint16_t ph_x_2;
+	uint16_t mag;
+	uint16_t ph;
 	uint32_t temp_adc;
 	
-	float mag_y_1;
-	float ph_y_1;
-	float mag_y_2;
-	float ph_y_2;
 	uint8_t temp2, temp3;
 	uint16_t temp;
 	
@@ -384,13 +380,12 @@ PT_THREAD(Calibration(struct pt *pt))
 				{
 					CalDataCalibr = malloc(sizeof(struct CalData_struct));
 					CalDataCalibr->Zarray = malloc(nF_cal*sizeof(Zarray_t));
-					CalDataCalibr->PHarray = malloc(nF_cal*sizeof(PHarray_t));
 				}
 				PrepareStructForZcal = GetPrepareStructForZcal();
 				if (PrepareStructForZcal.RamSize == 0)
 				{
 					printf ("\nCapacitor value too big. Connect lower capacitance.\n>");
-					wait(100);//wait 10 ms
+					wait(100);//wait 100 ms
 					AllowSaveFlag = 0;
 				}
 				else
@@ -409,110 +404,41 @@ PT_THREAD(Calibration(struct pt *pt))
 					temp_adc = DdsFreq;
 					AD9833_SetFreq(pCalibrateMagPhaseCalcTheoretic_st->freq);
 					/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/wait((float)10 * temp_adc / (pCalibrateMagPhaseCalcTheoretic_st->freq)/1000);
-					CalibrateMagPhaseCalcTheoretic(pCalibrateMagPhaseCalcTheoretic_st);
-					mag_y_1 = pCalibrateMagPhaseCalcTheoretic_st->mag;
-					ph_y_1 = pCalibrateMagPhaseCalcTheoretic_st->ph;
 					temp_adc = ADC_RUN(os);
-					ph_x_1 = (uint16_t)((temp_adc & 0xffff0000) >> 16);
-					mag_x_1 = (uint16_t)(temp_adc & 0xffff);
+					ph = (uint16_t)((temp_adc & 0xffff0000) >> 16);
+					mag = (uint16_t)(temp_adc & 0xffff);
 
-					CalDataCalibr->gZmax = mag_x_1; //Определение максимального значения модуля импеданса
-					//printf("\n%4u kHz %4u, %u;", cal_freq_list[PrepareStructForZcal.iFmin], mag_x_1, ph_x_1);
+					//printf("\n%4u kHz %4u, %u;", cal_freq_list[PrepareStructForZcal.iFmin], mag, ph);
 					
 					//freq_counter - индекс первой частоты частотного отрезка
 					for (freq_counter = PrepareStructForZcal.iFmin; freq_counter < PrepareStructForZcal.iFmax; freq_counter ++)
 					{
-						//Lower frequency
-						if (freq_counter != PrepareStructForZcal.iFmin)
-						{
-							mag_y_1 = mag_y_2;
-							ph_y_1 = ph_y_2;
-							mag_x_1 = mag_x_2;
-							ph_x_1 = ph_x_2;
-						}
-						//Highest frequency
 						pCalibrateMagPhaseCalcTheoretic_st->freq = cal_freq_list[freq_counter+1] * 1000;
 						AD9833_SetFreq(pCalibrateMagPhaseCalcTheoretic_st->freq);
 						wait(10);//wait 10 ms
-						CalibrateMagPhaseCalcTheoretic(pCalibrateMagPhaseCalcTheoretic_st);
-						mag_y_2 = pCalibrateMagPhaseCalcTheoretic_st->mag;
-						ph_y_2 = pCalibrateMagPhaseCalcTheoretic_st->ph;
 						temp_adc = ADC_RUN(os);
-						ph_x_2 = (uint16_t)((temp_adc & 0xffff0000) >> 16);
-						mag_x_2 = (uint16_t)(temp_adc & 0xffff);
-						printf("\n%4u %4u %u", cal_freq_list[freq_counter+1], mag_x_2, ph_x_2);
+						ph = (uint16_t)((temp_adc & 0xffff0000) >> 16);
+						mag = (uint16_t)(temp_adc & 0xffff);
+						printf("\n%4u %4u %u", cal_freq_list[freq_counter+1], mag, ph);
 //						printf("\n%4u kHz %4u, %u;", cal_freq_list[freq_counter+1], mag_x_2, ph_x_2);
-						CalDataCalibr->Zarray[freq_counter-PrepareStructForZcal.iFmin].Zmin = mag_x_2;
-						CalDataCalibr->PHarray[freq_counter-PrepareStructForZcal.iFmin].PHmin = ph_x_1;
-						
-						if (abs((int32_t)mag_x_2 - (int32_t)mag_x_1)<= 1)
-							// если измеренные значения модуля импеданса почти не изменились
-						{
-							CalDataCalibr->Zarray[freq_counter-CalDataCalibr->nFmin].k = 0;
-							CalDataCalibr->Zarray[freq_counter-CalDataCalibr->nFmin].b = (mag_y_1 + mag_y_2) / 2;
-						}
-						else
-							// модуль импеданса изменился, кривая АЧХ имеет наклон
-						{
-							CalDataCalibr->Zarray[freq_counter-CalDataCalibr->nFmin].k = (mag_y_2-mag_y_1) / (mag_x_2-mag_x_1);
-							CalDataCalibr->Zarray[freq_counter-CalDataCalibr->nFmin].b = mag_y_1-mag_x_1 * CalDataCalibr->Zarray[freq_counter-CalDataCalibr->nFmin].k;
-						}
-						if ((abs((int32_t)ph_x_2 - (int32_t)ph_x_1)<= 1))
-							// если измеренные значения фазы импеданса почти не изменились
-						{
-							CalDataCalibr->PHarray[freq_counter-CalDataCalibr->nFmin].k = 0;
-							CalDataCalibr->PHarray[freq_counter-CalDataCalibr->nFmin].b = (ph_y_1 + ph_y_2) / 2;
-						}
-						else
-							// фаза импеданса изменился, кривая ФЧХ имеет наклон
-						{
-							CalDataCalibr->PHarray[freq_counter-CalDataCalibr->nFmin].k = (ph_y_2-ph_y_1) / (ph_x_2-ph_x_1);
-							CalDataCalibr->PHarray[freq_counter-CalDataCalibr->nFmin].b = ph_y_1-ph_x_1 * CalDataCalibr->PHarray[freq_counter-CalDataCalibr->nFmin].k;
-						}
-						
-					}
-					//Определение минимального значения модуля импеданса
-					CalDataCalibr->gZmin = 65535;
-					for (temp=0; temp < (CalDataCalibr->nFmax - CalDataCalibr->nFmin); temp++)
-					{
-						if (CalDataCalibr->Zarray[temp].Zmin < CalDataCalibr->gZmin)
-						{
-							CalDataCalibr->gZmin = CalDataCalibr->Zarray[temp].Zmin;
-						}
+						CalDataCalibr->Zarray[freq_counter-PrepareStructForZcal.iFmin].mag = mag;
+						CalDataCalibr->Zarray[freq_counter-PrepareStructForZcal.iFmin].ph = ph;
 					}
 					CalZCounter++;	//Increment calibrating impedances counter
 					
-					printf("\ngZmin  = %10u", CalDataCalibr->gZmin);
-					//wait(50);
-					printf("\ngZmax  = %10u", CalDataCalibr->gZmax);
-					//wait(50);
-					printf("\ngPHmin = %10u", CalDataCalibr->gPHmin);
-					//wait(50);
-					printf("\ngPHmax = %10u", CalDataCalibr->gPHmax);
-					//wait(50);
-					printf("\nnFmin  = %10u", CalDataCalibr->nFmin);
-					//wait(50);
-					printf("\nnFmax  = %10u", CalDataCalibr->nFmax);
-					//wait(50);
-					printf("\nZarray:");
+					printf("\nC  = %6u", CalDataCalibr->C);
+					printf("\nR  = %4u", CalDataCalibr->R);
+					printf("\nnFmin  = %4u", CalDataCalibr->nFmin);
+					printf("\nnFmax  = %4u", CalDataCalibr->nFmax);
 					for (temp2 = 0; temp2 < (CalDataCalibr->nFmax - CalDataCalibr->nFmin); temp2++)
 					{
-						//wait(100);
-						printf("\nk, b, Zmin = %10.5f, %10.5f, %10u", CalDataCalibr->Zarray[temp2].k, CalDataCalibr->Zarray[temp2].b, CalDataCalibr->Zarray[temp2].Zmin);
+						printf("\nF, mag, ph = %10u, %10u, %10u", cal_freq_list[temp2], CalDataCalibr->Zarray[temp2].mag, CalDataCalibr->Zarray[temp2].ph);
 					}
-					printf("\nPHarray:");
-					for (temp2 = 0; temp2 < (CalDataCalibr->nFmax - CalDataCalibr->nFmin); temp2++)
-					{
-						//wait(100);
-						printf("\nk * 10^5, b, PHmin = %10.5f, %10.5f, %10u", CalDataCalibr->PHarray[temp2].k*100000, CalDataCalibr->PHarray[temp2].b, CalDataCalibr->PHarray[temp2].PHmin);
-					}
-					//wait(100);
-					
+				
 					if (CalZCounter == nZ_cal_max)
 					{
 						SaveCalData(CalDataCalibr, stop_saving);
 						free(CalDataCalibr->Zarray);
-						free(CalDataCalibr->PHarray);
 						free(CalDataCalibr);
 						printf("\nCalibration complete. Type next command.\n>");
 						LoadCalData();
@@ -531,7 +457,6 @@ PT_THREAD(Calibration(struct pt *pt))
 			{
 				SaveCalData(CalDataCalibr, stop_saving);
 				free(CalDataCalibr->Zarray);
-				free(CalDataCalibr->PHarray);
 				free(CalDataCalibr);
 				printf("\nCalibration coefficients were saved into flash. Type next command.\n>");
 				LoadCalData();
@@ -551,32 +476,14 @@ PT_THREAD(Calibration(struct pt *pt))
 			for (temp = 0; temp < nZ_cal; temp++)
 				{
 					printf("\n%u", temp);
-					//wait(5);
-					printf("\ngZmin  = %10u", CalData[temp].gZmin);
-					//wait(5);
-					printf("\ngZmax  = %10u", CalData[temp].gZmax);
-					//wait(5);
-					printf("\ngPHmin = %10u", CalData[temp].gPHmin);
-					//wait(5);
-					printf("\ngPHmax = %10u", CalData[temp].gPHmax);
-					//wait(5);
+					printf("\nС  = %10u", CalData[temp].C);
+					printf("\nR  = %10u", CalData[temp].R);
 					printf("\nnFmin  = %10u", CalData[temp].nFmin);
-					//wait(5);
 					printf("\nnFmax  = %10u", CalData[temp].nFmax);
-					//wait(5);
-					printf("\nZarray:");
 					for (temp2 = 0; temp2 < (CalData[temp].nFmax - CalData[temp].nFmin); temp2++)
 					{
-						//wait(10);
-						printf("\nk, b, Zmin = %10.5f, %10.5f, %10u", CalData[temp].Zarray[temp2].k, CalData[temp].Zarray[temp2].b, CalData[temp].Zarray[temp2].Zmin);
+						printf("\nF, mag, ph = %10u, %10u, %10u", cal_freq_list[temp2], CalData[temp].Zarray[temp2].mag, CalData[temp].Zarray[temp2].ph);
 					}
-					printf("\nPHarray:");
-					for (temp2 = 0; temp2 < (CalData[temp].nFmax - CalData[temp].nFmin); temp2++)
-					{
-						//wait(10);
-						printf("\nk * 10^5, b, PHmin = %10.5f, %10.5f, %10u", CalData[temp].PHarray[temp2].k*100000, CalData[temp].PHarray[temp2].b, CalData[temp].PHarray[temp2].PHmin);
-					}
-					//wait(10);
 				}
 			}
 			printf("\nCalibration data loaded from flash. Type next command.\n>");
@@ -610,17 +517,17 @@ uint8_t Calc_iZ_for_Min_Z_OnCur_iF (uint8_t freq_index)
 {
 	uint8_t zcounter, z_index = 0;
 	float min_Z, maybe_min_Z;
-	//
-	min_Z = CalData[0].gZmax;
+
+	min_Z = 1000000000;
 	for (zcounter = 0; zcounter < nZ_cal; zcounter++)
 	{
-		if (freq_index >= CalData[zcounter].nFmax)
-			maybe_min_Z = CalData[zcounter].gZmin;
-		else if (freq_index <= CalData[zcounter].nFmin)
-			maybe_min_Z = CalData[zcounter].gZmax;
+		if (freq_index > (CalData[zcounter].nFmax - 1))
+			maybe_min_Z = CalData[zcounter].Zarray[(CalData[zcounter].nFmax - CalData[zcounter].nFmin - 1)].mag;
+		else if (freq_index < CalData[zcounter].nFmin)
+			maybe_min_Z = CalData[zcounter].Zarray[0].mag;
 		else
 		{
-			maybe_min_Z = CalData[zcounter].Zarray[freq_index - CalData[zcounter].nFmin-1].Zmin;
+			maybe_min_Z = CalData[zcounter].Zarray[(CalData[zcounter].nFmax - 1 - CalData[zcounter].nFmin - freq_index)].mag;
 		}
 		if (min_Z > maybe_min_Z)
 		{
@@ -641,16 +548,17 @@ uint8_t Calc_iZ_for_Max_Z_OnCur_iF (uint8_t freq_index)
 {
 	uint8_t zcounter, z_index = 0;
 	float max_Z, maybe_max_Z;
-	max_Z = CalData[0].gZmin;
+	
+	max_Z = 0;
 	for (zcounter = 0; zcounter < nZ_cal; zcounter++)
 	{
-		if (freq_index >= CalData[zcounter].nFmax)
-			maybe_max_Z = CalData[zcounter].gZmin;
-		else if (freq_index <= CalData[zcounter].nFmin)
-			maybe_max_Z = CalData[zcounter].gZmax;
+		if (freq_index > (CalData[zcounter].nFmax - 1))
+			maybe_max_Z = CalData[zcounter].Zarray[(CalData[zcounter].nFmax - CalData[zcounter].nFmin - 1)].mag;
+		else if (freq_index < CalData[zcounter].nFmin)
+			maybe_max_Z = CalData[zcounter].Zarray[0].mag;
 		else
 		{
-			maybe_max_Z = CalData[zcounter].Zarray[freq_index - CalData[zcounter].nFmin-1].Zmin;
+			maybe_max_Z = CalData[zcounter].Zarray[(CalData[zcounter].nFmax - 1 - CalData[zcounter].nFmin - freq_index)].mag;
 		}
 		
 		if (maybe_max_Z > max_Z)
@@ -783,6 +691,17 @@ float GetRealZ_on_iF_iZ_for_Z (uint8_t freq_index, uint16_t Z, uint8_t iZ)
 	return ret;
 }
 
+float GetRealZ_on_F_iZ1_iZ2_for_Z(uint16_t freq, uint8_t iZ1, uint8_t iZ2, uint16_t Z)
+{
+	float Z_coef_low_freq, Z_coef_high_freq, ret;
+	
+	Z_coef_low_freq = (Z - CalData[iZ2].Zarray[(CalData[iZ2].nFmax - 1 - CalData[iZ2].nFmin - freq_index)].mag)/(CalData[iZ2].Zarray[(CalData[iZ2].nFmax - 1 - CalData[iZ2].nFmin - freq_index)].mag - CalData[iZ2].Zarray[(CalData[iZ2].nFmax - 1 - CalData[iZ2].nFmin - freq_index)].mag);
+	Z_coef_high_freq = (Z - CalData[iZ2].Zarray[(CalData[iZ2].nFmax - 1 - CalData[iZ2].nFmin - freq_index - 1)].mag)/(CalData[iZ2].Zarray[(CalData[iZ2].nFmax - 1 - CalData[iZ2].nFmin - freq_index - 1)].mag - CalData[iZ2].Zarray[(CalData[iZ2].nFmax - 1 - CalData[iZ2].nFmin - freq_index - 1)].mag);
+	
+	ret = Z_coef_low_freq * 
+	return 
+}
+
 /*********************************************************************//**
 * @brief        	Функция рассчитывает значение модуля импеданса по данным калибровочной нагрузки iZ на частоте freq
 									при измеренном импеданса Z
@@ -793,19 +712,9 @@ float GetRealZ_on_iF_iZ_for_Z (uint8_t freq_index, uint16_t Z, uint8_t iZ)
 **********************************************************************/
 float GetRealZ_on_F_iZ_for_Z(uint16_t freq, uint8_t iZ, uint16_t Z)
 {
-	uint8_t freq_index = 0;
 	float ret;
 	
-	while (cal_freq_list[freq_index] < freq)
-	{
-		freq_index++;
-	}
-	if (freq_index != 0)
-	{
-		freq_index--;
-	}
-	//Теперь freq_index - индекс нижней частоты частотного отрезка, который содержит зимерительную часоту freq.
-	if (freq_index < CalData[iZ].nFmin)
+		if (freq_index < CalData[iZ].nFmin)
 	{
 		ret = CalData[iZ].Zarray[0].k * Z + CalData[iZ].Zarray[0].b;
 		return ret;
@@ -824,19 +733,19 @@ float GetRealZ_on_F_iZ_for_Z(uint16_t freq, uint8_t iZ, uint16_t Z)
 	}
 }
 
-uint32_t GetCalZ_on_iZ_iF (uint8_t iZ, uint8_t iF)
+uint32_t GetCalZ_on_iZ_iF (uint8_t iZ, uint8_t freq_index)
 {
-	if (iF <= CalData[iZ].nFmin)
+	if (freq_index > (CalData[iZ].nFmax - 1))
 	{
-		return CalData[iZ].gZmax;
+		return CalData[iZ].Zarray[(CalData[iZ].nFmax - 1 - CalData[iZ].nFmin)].mag;
 	}
-	else if (iF >= CalData[iZ].nFmax)
+	else if (freq_index < CalData[iZ].nFmin)
 	{
-		return CalData[iZ].gZmin;
+		return CalData[iZ].Zarray[0].mag;
 	}
 	else
 	{
-		return CalData[iZ].Zarray[iF - CalData[iZ].nFmin - 1].Zmin;
+		return CalData[iZ].Zarray[(CalData[iZ].nFmax - 1 - CalData[iZ].nFmin - freq_index)].mag;
 	}
 }
 
@@ -851,7 +760,6 @@ float GetCalZ_on_F_iZ (uint8_t iZ, uint16_t freq)
 {
 	float ret, t1,t2;
 	uint8_t freq_index=0;
-	float f_coef;
 	
 	while (cal_freq_list[freq_index] < freq)
 	{
@@ -861,9 +769,6 @@ float GetCalZ_on_F_iZ (uint8_t iZ, uint16_t freq)
 	{
 		freq_index--;
 	}
-	
-	f_coef = ((float)(freq - cal_freq_list[freq_index]))/(cal_freq_list[freq_index+1] - cal_freq_list[freq_index]);
-	
 	if (freq_index < (nF_cal-1))
 	{
 		t1 = GetCalZ_on_iZ_iF(iZ, freq_index);
@@ -1016,7 +921,6 @@ float GetRealPH_on_F_iZ_for_Z(uint16_t freq, uint8_t iZ, uint16_t PH)
 void Measure(float results[2], uint16_t freq)
 {
 	uint16_t mag, ph;
-	uint8_t freq_index=0;		//Индекс калибровочной частоты, которая ближайшая к freq, но меньше нее
 	
 	uint8_t	I_Zcal_min_1=0;		//Индекс калибровочной нагрузки, имеющей минимальное сопротивление на нижней частоте диапазона
 	uint8_t	I_Zcal_min_2=0;		//Индекс калибровочной нагрузки, имеющей минимальное сопротивление на верхней частоте диапазона
@@ -1028,13 +932,11 @@ void Measure(float results[2], uint16_t freq)
 	float f_coef, z_coef_1, z_coef_2, ph_coef_1, ph_coef_2;
 	
 	float Zmin_on_cur_F, Zmax_on_cur_F;
-	struct IndZwith_uint_Z_str * pIndZwith_uint_Z;
 	float ZcalOnLowFreqLowIndex, ZcalOnLowFreqHighIndex, ZcalOnHighFreqLowIndex, ZcalOnHighFreqHighIndex;
 	float ZmeasuredOnLowFreqLowIndex, ZmeasuredOnLowFreqHighIndex, ZmeasuredOnHighFreqLowIndex, ZmeasuredOnHighFreqHighIndex;
 	float PHcalOnLowFreqLowIndex, PHcalOnLowFreqHighIndex, PHcalOnHighFreqLowIndex, PHcalOnHighFreqHighIndex;
 	float PHmeasuredOnLowFreqLowIndex, PHmeasuredOnLowFreqHighIndex, PHmeasuredOnHighFreqLowIndex, PHmeasuredOnHighFreqHighIndex;
 	
-	pIndZwith_uint_Z = malloc(sizeof(struct IndZwith_uint_Z_str)*nZ_cal);
 	temp_adc = ADC_RUN(os);
 	ph = (uint16_t)((temp_adc & 0xffff0000) >> 16);
 	mag = (uint16_t)(temp_adc & 0xffff);
@@ -1051,11 +953,8 @@ void Measure(float results[2], uint16_t freq)
 			freq_index--;
 		}
 		//Теперь freq_index - индекс нижней частоты частотного отрезка, который содержит измерительную часоту freq.
-		
-		SortZIndOnCurF (pIndZwith_uint_Z, freq);
-		//Отсоритруем массив структур модулей калибровочных нагрузок и их индексов на данной частоте.
-		//// ДОДУМАТЬ!!!!!!!
-		
+		f_coef = ((float)(freq - cal_freq_list[freq_index]))/(cal_freq_list[freq_index+1] - cal_freq_list[freq_index]);
+				
 		f_coef = ((float)(freq - cal_freq_list[freq_index]))/(cal_freq_list[freq_index+1] - cal_freq_list[freq_index]);
 		//f_coef это коэффициент, определяющий распорложение частоты freq между соседними с ней измерительными частотами
 		
@@ -1080,8 +979,7 @@ void Measure(float results[2], uint16_t freq)
 		
 		if (mag >= Zmax_on_cur_F)
 		{
-			results[0] = GetRealZ_on_F_iZ_for_Z(freq, I_Zcal_max_1, mag) * (1 - f_coef);
-			results[0] += GetRealZ_on_F_iZ_for_Z(freq, I_Zcal_max_2, mag) * f_coef;
+			results[0] = GetRealZ_on_F_iZ1_iZ2_for_Z(freq, I_Zcal_max_1, I_Zcal_max_2, mag);
 			if (debug_mode==1)
 			{
 				printf("\nmag >= Zmax_on_cur_F, I_Zcal_max_1 = %u, I_Zcal_max_2 = %u", I_Zcal_max_1,I_Zcal_max_2);
