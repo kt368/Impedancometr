@@ -57,7 +57,10 @@ struct CalData_struct {	//Size 8*32 bit = 8*4 bytes = 32 byte
 	uint32_t	nFmin;			//Индекс первой калибровочной частоты
 	uint32_t	nFmax;			//Индекс +1 максимальной калибровочной частоты.
 	uint32_t	C;					//Калибровочный конденсатор (в пФ).
-	uint32_t	R;					//Калибровочный резистор, паралельный конденсатору (в Ом).
+	uint32_t	Rp;					//Калибровочный резистор, паралельный конденсатору (в Ом).
+	uint32_t	Rs;					//Калибровочный резистор, последовательно с конденсатором (в Ом).
+	uint32_t	Rt;					//Калибровочный резистор, между двумя верхними электродами (в Ом).
+	uint32_t	Rb;					//Калибровочный резистор, между двумя нижними электродами (в Ом).
 	Zarray_t 	*Zarray;		//pointer to dynsmic size array of structs (n not necessarily equal nF)
 												//We have nFmax - nFmin sets of calibrating coefficients
 };
@@ -77,9 +80,9 @@ void V12SW_ON2(void);
 void CalibrateMagPhaseCalcTheoretic(mag_ph_calc_calibr_struct_t *);
 void logspace(uint32_t base, uint8_t n_bins, uint32_t min, uint32_t max, uint32_t array[]);
 uint16_t CalcCalibrDataSize(void);
-uint8_t Calc_iZ_for_Min_Z_OnCur_iF (uint8_t freq_index);
-uint8_t Calc_iZ_for_Max_Z_OnCur_iF (uint8_t freq_index);
-void SortZIndOnCurF (struct IndZwith_uint_Z_str * pIndZwith_uint_Z, uint16_t freq);
+uint16_t Calc_iZ_for_Min_Z_OnCur_iF (uint8_t freq_index);
+uint16_t Calc_iZ_for_Max_Z_OnCur_iF (uint8_t freq_index);
+//void SortZIndOnCurF (struct IndZwith_uint_Z_str * pIndZwith_uint_Z, uint16_t freq);
 struct PrepareStructForZcal_str {
 	uint8_t		iFmin;
 	uint8_t 	iFmax;
@@ -92,24 +95,27 @@ int compare_structs_on_float_Z_and_iZ(const void *arg1, const void *arg2);
 
 void Measure(float results[2], uint16_t freq);
 
-void GetCorrectIndexes(uint8_t* pCorrectIndexes, uint16_t freq, float mag, float ph);
-float GetSumOtkl(float mag, float ph, uint16_t freq, uint8_t n_cal);
+void GetCorrectIndexes(uint16_t* pCorrectIndexes, uint16_t freq, float mag, float ph);
+float GetSumOtkl(float mag, float ph, uint16_t freq, uint16_t iZ);
 
-uint32_t GetCalZ_on_iZ_iF (uint8_t iZ, uint8_t iF);
-uint32_t GetCalPH_on_iZ_iF (uint8_t iZ, uint8_t iF);
+uint32_t GetCalZ_on_iZ_iF (uint16_t iZ, uint8_t iF);
+uint32_t GetCalPH_on_iZ_iF (uint16_t iZ, uint8_t iF);
 
-float GetCalZ_on_F_iZ (uint8_t iZ, uint16_t freq);
-float GetCalPH_on_F_iZ (uint8_t iZ, uint16_t freq);
+float GetCalZ_on_F_iZ (uint16_t iZ, uint16_t freq);
+float GetCalPH_on_F_iZ (uint16_t iZ, uint16_t freq);
 
-float GetRealZ_on_F_iZ_for_Z(uint16_t freq, uint8_t iZ, uint16_t Z);
-float GetRealZ_on_F_iZ1_iZ2_for_Z(uint16_t freq, uint8_t iZ1, uint8_t iZ2, uint16_t Z);
-float GetRealZ_on_iF_iZ_for_Z (uint8_t freq_index, uint16_t Z, uint8_t iZ);
+//float GetRealZ_on_F_iZ_for_Z(uint16_t freq, uint8_t iZ, uint16_t Z);
+float GetRealZ_on_F_iZ1_iZ2_for_Z(uint16_t freq, uint16_t iZ1, uint16_t iZ2, uint16_t Z);
+float GetRealPH_on_F_iZ1_iZ2_for_PH(uint16_t freq, uint16_t iZ1, uint16_t iZ2, uint16_t PH);
+//float GetRealZ_on_iF_iZ_for_Z (uint8_t freq_index, uint16_t Z, uint8_t iZ);
 
-float GetRealPH_on_F_iZ_for_Z(uint16_t freq, uint8_t iZ, uint16_t PH);
-float GetRealPH_on_iF_iZ_for_PH (uint8_t freq_index, uint16_t PH, uint8_t iZ);
+//float GetRealPH_on_F_iZ_for_Z(uint16_t freq, uint8_t iZ, uint16_t PH);
+//float GetRealPH_on_iF_iZ_for_PH (uint8_t freq_index, uint16_t PH, uint8_t iZ);
 
 void wait (uint32_t t);
 struct PrepareStructForZcal_str GetPrepareStructForZcal (void);
+
+void GetRealCalMagPh(float result[2], uint16_t freq, uint16_t iZ);
 
 extern void AD9833_SPI_Init(void);
 extern void AD9833_SetFreq(uint32_t freq);

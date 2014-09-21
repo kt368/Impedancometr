@@ -16,11 +16,12 @@ uint32_t SectorWithArrayStartaddr = SectorWithFirstArrayStartaddr;
 extern char cmdbuf [15];
 extern int uart_rcv_len_cnt;
 uint32_t FlashCalStructStartaddr = FlashCalStructStartaddr_def;
+
 uint8_t SectorWithCalStructNum = SectorWithCalStructNum_def;
 uint32_t SectorWithCalStructStartaddr = SectorWithCalStructStartaddr_def;
-
 // начина€ с адреса SectorWithCalStructStartaddr записываетс€ массив структур CalDataStr, в него вписываютс€ указатели на массивы
-// Zarray и PHarray, наход€щиес€ начина€ с адресса SectorWithArrayStartaddr. ћассивы занимают до двух секторов.
+// Zarray, сохраненные начина€ с адресса SectorWithArrayStartaddr. ћассивы могут занимать несколько секторов.
+
 void SaveCalData( struct CalData_struct* CalDataClibr, uint8_t stop_bit )
 {
 	static uint32_t BufferWithArrays[128] __attribute__((at(0x10000100)));
@@ -81,57 +82,41 @@ void SaveCalData( struct CalData_struct* CalDataClibr, uint8_t stop_bit )
 	//—охранение во флеш массива Zarray дл€ текущей калибровочной нагрузки
 	for (CalFCounter = 0; CalFCounter < ( CalDataClibr->nFmax - CalDataClibr->nFmin ); CalFCounter++)
 	{
-		BufferWithArrays[buffer_pointer] = *(uint32_t*)&(CalDataClibr->Zarray[CalFCounter].k);
+		BufferWithArrays[buffer_pointer] = *(uint32_t*)&(CalDataClibr->Zarray[CalFCounter].mag);
 		buffer_pointer++;
 		CheckAndStoreCalData(&StoreIndexArray, &buffer_pointer, BufferWithArrays, &SectorWithArrayStartaddr, &SectorWithArrayCounter, 512);
-		BufferWithArrays[buffer_pointer] = *(uint32_t*)&(CalDataClibr->Zarray[CalFCounter].b);
-		buffer_pointer++;
-		CheckAndStoreCalData(&StoreIndexArray, &buffer_pointer, BufferWithArrays, &SectorWithArrayStartaddr, &SectorWithArrayCounter, 512);
-		BufferWithArrays[buffer_pointer] = *(uint32_t*)&(CalDataClibr->Zarray[CalFCounter].Zmin);
+		BufferWithArrays[buffer_pointer] = *(uint32_t*)&(CalDataClibr->Zarray[CalFCounter].ph);
 		buffer_pointer++;
 		CheckAndStoreCalData(&StoreIndexArray, &buffer_pointer, BufferWithArrays, &SectorWithArrayStartaddr, &SectorWithArrayCounter, 512);
 	}
-	//—охранение во флеш массива PHarray дл€ текущей калибровочной нагрузки с номером CalZCounter (в текущем запуске функции SaveCalData)
-	for (CalFCounter = 0; CalFCounter < ( CalDataClibr->nFmax - CalDataClibr->nFmin ); CalFCounter++)
-	{
-		BufferWithArrays[buffer_pointer] = *(uint32_t*)&(CalDataClibr->PHarray[CalFCounter].k);
-		buffer_pointer++;
-		CheckAndStoreCalData(&StoreIndexArray, &buffer_pointer, BufferWithArrays, &SectorWithArrayStartaddr, &SectorWithArrayCounter, 512);
-		BufferWithArrays[buffer_pointer] = *(uint32_t*)&(CalDataClibr->PHarray[CalFCounter].b);
-		buffer_pointer++;
-		CheckAndStoreCalData(&StoreIndexArray, &buffer_pointer, BufferWithArrays, &SectorWithArrayStartaddr, &SectorWithArrayCounter, 512);
-		BufferWithArrays[buffer_pointer] = *(uint32_t*)&(CalDataClibr->PHarray[CalFCounter].PHmin);
-		buffer_pointer++;
-		CheckAndStoreCalData(&StoreIndexArray, &buffer_pointer, BufferWithArrays, &SectorWithArrayStartaddr, &SectorWithArrayCounter, 512);			
-	}
-	
+		
 	//«апись описани€ калибровочных структур
-	BufferWithStructs[Structs_descr_pointer] = *(uint32_t*)&(CalDataClibr->gZmin);
+	BufferWithStructs[Structs_descr_pointer] = *(uint32_t*)&(CalDataClibr->nFmin);
 	Structs_descr_pointer++;
 	CheckAndStoreCalData(&StoreIndex, &Structs_descr_pointer, BufferWithStructs, &FlashCalStructStartaddr, &SectorWithCalStructNum, 512);
-	BufferWithStructs[Structs_descr_pointer] = *(uint32_t*)&(CalDataClibr->gZmax);
+	BufferWithStructs[Structs_descr_pointer] = *(uint32_t*)&(CalDataClibr->nFmax);
 	Structs_descr_pointer++;
 	CheckAndStoreCalData(&StoreIndex, &Structs_descr_pointer, BufferWithStructs, &FlashCalStructStartaddr, &SectorWithCalStructNum, 512);
-	BufferWithStructs[Structs_descr_pointer] = *(uint32_t*)&(CalDataClibr->gPHmin);
+	BufferWithStructs[Structs_descr_pointer] = *(uint32_t*)&(CalDataClibr->C);
 	Structs_descr_pointer++;
 	CheckAndStoreCalData(&StoreIndex, &Structs_descr_pointer, BufferWithStructs, &FlashCalStructStartaddr, &SectorWithCalStructNum, 512);
-	BufferWithStructs[Structs_descr_pointer] = *(uint32_t*)&(CalDataClibr->gPHmax);
+	BufferWithStructs[Structs_descr_pointer] = *(uint32_t*)&(CalDataClibr->Rp);
 	Structs_descr_pointer++;
 	CheckAndStoreCalData(&StoreIndex, &Structs_descr_pointer, BufferWithStructs, &FlashCalStructStartaddr, &SectorWithCalStructNum, 512);
-	BufferWithStructs[Structs_descr_pointer] = CalDataClibr->nFmin;
+	BufferWithStructs[Structs_descr_pointer] = *(uint32_t*)&(CalDataClibr->Rs);
 	Structs_descr_pointer++;
 	CheckAndStoreCalData(&StoreIndex, &Structs_descr_pointer, BufferWithStructs, &FlashCalStructStartaddr, &SectorWithCalStructNum, 512);
-	BufferWithStructs[Structs_descr_pointer] = CalDataClibr->nFmax;
+	BufferWithStructs[Structs_descr_pointer] = *(uint32_t*)&(CalDataClibr->Rt);
+	Structs_descr_pointer++;
+	CheckAndStoreCalData(&StoreIndex, &Structs_descr_pointer, BufferWithStructs, &FlashCalStructStartaddr, &SectorWithCalStructNum, 512);
+	BufferWithStructs[Structs_descr_pointer] = *(uint32_t*)&(CalDataClibr->Rb);
 	Structs_descr_pointer++;
 	CheckAndStoreCalData(&StoreIndex, &Structs_descr_pointer, BufferWithStructs, &FlashCalStructStartaddr, &SectorWithCalStructNum, 512);
 	//«апись указателей на начало массива Zarray
 	BufferWithStructs[Structs_descr_pointer] = CalDataFlashAddress;
 	Structs_descr_pointer++;
 	CheckAndStoreCalData(&StoreIndex, &Structs_descr_pointer, BufferWithStructs, &FlashCalStructStartaddr, &SectorWithCalStructNum, 512);
-	//«апись указателей на начало массива PHarray
-	BufferWithStructs[Structs_descr_pointer] = CalDataFlashAddress + (CalDataClibr->nFmax - CalDataClibr->nFmin)*sizeof(Zarray_t);
-	Structs_descr_pointer++;
-	CheckAndStoreCalData(&StoreIndex, &Structs_descr_pointer, BufferWithStructs, &FlashCalStructStartaddr, &SectorWithCalStructNum, 512);
+	
 	StoredZCounter++;
 	
 	if (stop_bit == stop_saving)	// ≈сли это последн€€ запись
@@ -148,7 +133,7 @@ void SaveCalData( struct CalData_struct* CalDataClibr, uint8_t stop_bit )
 		CheckAndStoreCalData(&StoreIndexArray, &buffer_pointer, BufferWithArrays, &SectorWithArrayStartaddr, &SectorWithArrayCounter, 512);
 		Structs_descr_pointer = 128;
 		CheckAndStoreCalData(&StoreIndex, &Structs_descr_pointer, BufferWithStructs, &FlashCalStructStartaddr, &SectorWithCalStructNum, 512);
-		for (temp = 1; temp < buffer_pointer; temp++)
+		for (temp = 1; temp < Structs_descr_pointer; temp++)
 		{
 			BufferWithStructs[temp] = 0;
 		}
@@ -158,7 +143,7 @@ void SaveCalData( struct CalData_struct* CalDataClibr, uint8_t stop_bit )
 		CheckAndStoreCalData(&StoreIndex, &Structs_descr_pointer, BufferWithStructs, &SectorWithCalStructStartaddr, &SectorWithCalStructNum, 256);
 	}
 	// –ассчитываем адрес следующего массива Zarray_t
-	CalDataFlashAddress += ( CalDataClibr->nFmax - CalDataClibr->nFmin ) * (sizeof(Zarray_t) + sizeof(PHarray_t));
+	CalDataFlashAddress += ( CalDataClibr->nFmax - CalDataClibr->nFmin ) * (sizeof(Zarray_t));
 }
 
 void LoadCalData(void)

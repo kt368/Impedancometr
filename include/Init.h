@@ -21,7 +21,7 @@ void Init_GPIO_Pins (void);
 void Init (void);
 void Init_ADC (void);
 void Starting_init (void);
-extern void SER_Init(void);
+extern void SER_Init(uint32_t baudrate);
 
 PT_THREAD(Starting(struct pt *pt));
 

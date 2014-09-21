@@ -11,7 +11,7 @@
 
 UART_CFG_Type UART_ConfigStruct;
 
-void SER_Init(void);
+void SER_Init(uint32_t baudrate);
 extern void test(void);
 extern void CalibrateMagPhaseCalcTheoretic(mag_ph_calc_calibr_struct_t *);
 extern void wait(uint32_t);

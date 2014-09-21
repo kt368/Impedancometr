@@ -63,7 +63,7 @@ PINSEL_CFG_Type PinCfg;
 		I2S_FreqConfig(LPC_I2S, fs, I2S_TX_MODE);
 
 		
-		SER_Init();		
+		SER_Init(115200);
 		BatCharge_OFF;								
 
 	//Switch OFF battarey charging

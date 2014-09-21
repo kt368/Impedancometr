@@ -1,6 +1,0 @@
--c --cpu Cortex-M3 -g -O0 --apcs=interwork -I.\include -I.\include\drivers -I.\include\LPC17XX -I.\include\protothreads
--I C:\Keil_v5\ARM\RV31\INC
--I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include
--I C:\Keil_v5\ARM\Inc\NXP\LPC17xx
--DLPC17XX
--o .\system.o --omf_browse .\system.crf --depend .\system.d "source\System.c"

@@ -30,16 +30,16 @@ uint8_t StartADC=0,StartADC_mag=0,StartADC_ph=0;
 uint32_t ADCnumber=32768;
 uint8_t os=16;
 
-extern uint8_t debug_mode;
+extern uint8_t debug_mode, raw_data_mode;
 
 extern uint_fast8_t UartWithFifo;
 
-void SER_Init(void)
+void SER_Init(uint32_t baudrate)
 {
 	UART_CFG_Type UART_ConfigStruct;
 	UART_FIFO_CFG_Type UART_FIFOInitStruct;
 	
-	UART_ConfigStruct.Baud_rate = 256000;
+	UART_ConfigStruct.Baud_rate = baudrate;
 	UART_ConfigStruct.Parity = UART_PARITY_NONE;
 	UART_ConfigStruct.Stopbits = UART_STOPBIT_1;
 	UART_ConfigStruct.Databits = UART_DATABIT_8;
@@ -70,16 +70,12 @@ void UART0_IRQHandler(void)
 	static uint16_t frequency=1;
 	float results[2];
 	uint32_t temp;
-	
-//	pCalibrateMagPhaseCalcTheoretic_st=&MagPhcT_st;
-	
 	uint32_t U0IIR = 0;
+	uint32_t baudrate;
+	
 	U0IIR=UART_GetIntId(LPC_UART0);
 	if ((U0IIR & 0xE) == 0x4)
 	{
-		//scanf ("%c", &str);	
-		//printf("\f");
-		//printf("\n%c OK.", str);
 		c = UART_ReceiveByte(LPC_UART0);
     if (c == CR) c = LF;  /* read character                 */
 		if (c != LF)
@@ -162,27 +158,6 @@ void UART0_IRQHandler(void)
 					bg_flag = 1;
 					UART_pressed_enter = 0;
 				}
-//				else if (strncmp(cmdbuf, "fs", 2) == 0)
-//				{
-//					t1 = atoi(&(cmdbuf[3]));
-//					ADC_Init(LPC_ADC, t1*1000);
-//					ADC_ChannelCmd(LPC_ADC,_ADC_CHANNEL,ENABLE);
-//					printf("\nADC samling rate are %u ksps\n>", t1);
-//					UART_pressed_enter = 0;
-//				}
-//				else if (strncmp(cmdbuf, "nob", 3) == 0)
-//				{
-//					t2 = atoi(&(cmdbuf[3]));
-//					printf("\nADC number of bits are %u\n>", t2);
-//					UART_pressed_enter = 0;
-//				}
-//				else if (strncmp(cmdbuf, "os", 2) == 0)
-//				{
-//					t3 = atoi(&(cmdbuf[3]));
-//					printf("\nADC oversampling are %u bits\n>", t3);
-//					UART_pressed_enter = 0;
-//				}
-				
 				else if (strncmp(cmdbuf, "o ", 2) == 0)
 				{
 					os = atoi(&(cmdbuf[2]));
@@ -221,6 +196,20 @@ void UART0_IRQHandler(void)
 					printf("\nType next command.\n>");
 					UART_pressed_enter = 0;
 				}
+				else if (strncmp(cmdbuf, "raw ", 4) == 0)
+				{
+					raw_data_mode = atoi(&(cmdbuf[4]));
+					if (raw_data_mode == 0)
+					{
+						printf("\n Raw data mode disabled.");
+					}
+					else
+					{
+						printf("\n Raw data mode enabled.");
+					}
+					printf("\nType next command.\n>");
+					UART_pressed_enter = 0;
+				}
 				else if (strncmp(cmdbuf, "UartFifo ", 9) == 0)
 				{
 					UartWithFifo = atoi(&(cmdbuf[9]));
@@ -232,6 +221,14 @@ void UART0_IRQHandler(void)
 					{
 						printf("\n Software UART FIFO enabled.");
 					}
+					printf("\nType next command.\n>");
+					UART_pressed_enter = 0;
+				}
+				else if (strncmp(cmdbuf, "UART ", 5) == 0)
+				{
+					baudrate = atoi(&(cmdbuf[5]));
+					SER_Init(baudrate);
+					printf("\n UART baudrate are %u bps.", baudrate);
 					printf("\nType next command.\n>");
 					UART_pressed_enter = 0;
 				}

@@ -166,7 +166,24 @@
           <Name>-O463 -S0 -C0 -FO7  -FN1 -FC800 -FD10000000 -FF0LPC_IAP_512 -FL040000 -FS00</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>993</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>23568</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>.\source\System.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\AD8302\source/System.c\993</Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -191,82 +208,92 @@
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>CalData[140],0x0A</ItemText>
+          <ItemText>Z1lf</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>1</WinNumber>
-          <ItemText>CalData[141],0x0A</ItemText>
+          <ItemText>Z2lf</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>1</WinNumber>
-          <ItemText>CalData[0].Zarray[14],0x0A</ItemText>
+          <ItemText>Z1hf</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>os</ItemText>
+          <ItemText>Z2hf</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
           <WinNumber>1</WinNumber>
-          <ItemText>IndZwith_float_Z[0],0x0A</ItemText>
+          <ItemText>Zmin_on_cur_F</ItemText>
         </Ww>
         <Ww>
           <count>9</count>
           <WinNumber>1</WinNumber>
-          <ItemText>IndZwith_float_Z[1],0x0A</ItemText>
+          <ItemText>SectorWithArrayCounter,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>10</count>
           <WinNumber>1</WinNumber>
-          <ItemText>IndZwith_float_Z[2],0x0A</ItemText>
+          <ItemText>SectorWithArrayStartaddr</ItemText>
         </Ww>
         <Ww>
           <count>11</count>
           <WinNumber>1</WinNumber>
-          <ItemText>IndZwith_float_Z[4],0x0A</ItemText>
+          <ItemText>CalData[601],0x0A</ItemText>
         </Ww>
         <Ww>
           <count>12</count>
           <WinNumber>1</WinNumber>
-          <ItemText>WSectorWithCalStructNum,0x0A</ItemText>
+          <ItemText>freq_index,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>13</count>
           <WinNumber>1</WinNumber>
-          <ItemText>StoreIndexArray,0x0A</ItemText>
+          <ItemText>CalData[iZ].nFmin</ItemText>
         </Ww>
         <Ww>
           <count>14</count>
           <WinNumber>1</WinNumber>
-          <ItemText>SectorWithArrayCounter,0x0A</ItemText>
+          <ItemText>freq_index,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>15</count>
           <WinNumber>1</WinNumber>
-          <ItemText>SectorWithArrayStartaddr</ItemText>
+          <ItemText>CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin].mag,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>16</count>
           <WinNumber>1</WinNumber>
-          <ItemText>SectorWithArrayStoredSize,0x0A</ItemText>
+          <ItemText>(int32_t)CalData[iZ2].Zarray[freq_index - CalData[iZ2].nFmin].mag,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>17</count>
           <WinNumber>1</WinNumber>
-          <ItemText>((uint32_t)(*StoreIndex))</ItemText>
+          <ItemText>CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin].mag</ItemText>
         </Ww>
         <Ww>
           <count>18</count>
           <WinNumber>1</WinNumber>
-          <ItemText>CalDataCalibr.PHarray</ItemText>
+          <ItemText>Z,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>19</count>
           <WinNumber>1</WinNumber>
-          <ItemText>CalDataCalibr.PHarray[0].k</ItemText>
+          <ItemText>(int32_t)(Z) - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin].mag)</ItemText>
+        </Ww>
+        <Ww>
+          <count>20</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>freq,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>21</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>CalData[iZ],0x0A</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -280,19 +307,24 @@
           <WinNumber>2</WinNumber>
           <ItemText>*pIndZwithZ</ItemText>
         </Ww>
+        <Ww>
+          <count>2</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>buffer_pointer,0x0A</ItemText>
+        </Ww>
       </WatchWindow2>
       <MemoryWindow1>
         <Mm>
           <WinNumber>1</WinNumber>
           <SubType>2</SubType>
-          <ItemText>0x20083348</ItemText>
+          <ItemText>0x00038000</ItemText>
         </Mm>
       </MemoryWindow1>
       <MemoryWindow2>
         <Mm>
           <WinNumber>2</WinNumber>
           <SubType>2</SubType>
-          <ItemText>0x00068100</ItemText>
+          <ItemText>0x00030100</ItemText>
         </Mm>
       </MemoryWindow2>
       <MemoryWindow3>

@@ -170,9 +170,41 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>485</LineNumber>
+          <LineNumber>124</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>19902</Address>
+          <Address>11448</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>.\source\Flash_save_read.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\AD8302\source/Flash_save_read.c\124</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>100</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>11168</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>.\source\Flash_save_read.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\AD8302\source/Flash_save_read.c\100</Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
+          <LineNumber>414</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>18366</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -181,7 +213,23 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\source\System.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\AD8302\source/System.c\485</Expression>
+          <Expression>\\AD8302\source/System.c\414</Expression>
+        </Bp>
+        <Bp>
+          <Number>3</Number>
+          <Type>0</Type>
+          <LineNumber>397</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>18304</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>.\source\System.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\AD8302\source/System.c\397</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -208,82 +256,87 @@
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>CalData[140],0x0A</ItemText>
+          <ItemText>Z1lf</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>1</WinNumber>
-          <ItemText>CalData[141],0x0A</ItemText>
+          <ItemText>Z2lf</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>1</WinNumber>
-          <ItemText>CalData[0].Zarray[14],0x0A</ItemText>
+          <ItemText>Z1hf</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>os</ItemText>
+          <ItemText>Z2hf</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
           <WinNumber>1</WinNumber>
-          <ItemText>IndZwith_float_Z[0],0x0A</ItemText>
+          <ItemText>Zmin_on_cur_F</ItemText>
         </Ww>
         <Ww>
           <count>9</count>
           <WinNumber>1</WinNumber>
-          <ItemText>IndZwith_float_Z[1],0x0A</ItemText>
+          <ItemText>SectorWithArrayCounter,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>10</count>
           <WinNumber>1</WinNumber>
-          <ItemText>IndZwith_float_Z[2],0x0A</ItemText>
+          <ItemText>SectorWithArrayStartaddr</ItemText>
         </Ww>
         <Ww>
           <count>11</count>
           <WinNumber>1</WinNumber>
-          <ItemText>IndZwith_float_Z[4],0x0A</ItemText>
+          <ItemText>CalData[iZ].Zarray[0].mag</ItemText>
         </Ww>
         <Ww>
           <count>12</count>
           <WinNumber>1</WinNumber>
-          <ItemText>WSectorWithCalStructNum,0x0A</ItemText>
+          <ItemText>freq_index,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>13</count>
           <WinNumber>1</WinNumber>
-          <ItemText>StoreIndexArray,0x0A</ItemText>
+          <ItemText>CalData[iZ].nFmin</ItemText>
         </Ww>
         <Ww>
           <count>14</count>
           <WinNumber>1</WinNumber>
-          <ItemText>SectorWithArrayCounter,0x0A</ItemText>
+          <ItemText>freq_index,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>15</count>
           <WinNumber>1</WinNumber>
-          <ItemText>SectorWithArrayStartaddr</ItemText>
+          <ItemText>CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin].mag,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>16</count>
           <WinNumber>1</WinNumber>
-          <ItemText>SectorWithArrayStoredSize,0x0A</ItemText>
+          <ItemText>(int32_t)CalData[iZ2].Zarray[freq_index - CalData[iZ2].nFmin].mag,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>17</count>
           <WinNumber>1</WinNumber>
-          <ItemText>((uint32_t)(*StoreIndex))</ItemText>
+          <ItemText>CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin].mag</ItemText>
         </Ww>
         <Ww>
           <count>18</count>
           <WinNumber>1</WinNumber>
-          <ItemText>CalDataCalibr.PHarray</ItemText>
+          <ItemText>Z,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>19</count>
           <WinNumber>1</WinNumber>
-          <ItemText>CalDataCalibr.PHarray[0].k</ItemText>
+          <ItemText>(int32_t)(Z) - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin].mag)</ItemText>
+        </Ww>
+        <Ww>
+          <count>20</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>freq,0x0A</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -297,19 +350,24 @@
           <WinNumber>2</WinNumber>
           <ItemText>*pIndZwithZ</ItemText>
         </Ww>
+        <Ww>
+          <count>2</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>buffer_pointer,0x0A</ItemText>
+        </Ww>
       </WatchWindow2>
       <MemoryWindow1>
         <Mm>
           <WinNumber>1</WinNumber>
           <SubType>2</SubType>
-          <ItemText>0x20083348</ItemText>
+          <ItemText>0x00038000</ItemText>
         </Mm>
       </MemoryWindow1>
       <MemoryWindow2>
         <Mm>
           <WinNumber>2</WinNumber>
           <SubType>2</SubType>
-          <ItemText>0x00068100</ItemText>
+          <ItemText>0x00030100</ItemText>
         </Mm>
       </MemoryWindow2>
       <MemoryWindow3>
@@ -325,7 +383,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
