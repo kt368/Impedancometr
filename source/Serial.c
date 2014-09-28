@@ -72,6 +72,10 @@ void UART0_IRQHandler(void)
 	uint32_t temp;
 	uint32_t U0IIR = 0;
 	uint32_t baudrate;
+	extern uint8_t CorrectIndexesOverride;
+	extern uint16_t FirstOverrideIndex;
+	extern uint16_t SecondOverrideIndex;
+	char *EndFromStrtoul;
 	
 	U0IIR=UART_GetIntId(LPC_UART0);
 	if ((U0IIR & 0xE) == 0x4)
@@ -232,11 +236,38 @@ void UART0_IRQHandler(void)
 					printf("\nType next command.\n>");
 					UART_pressed_enter = 0;
 				}
+				else if (strncmp(cmdbuf, "CIO ", 4) == 0)
+				{
+					CorrectIndexesOverride = atoi(&(cmdbuf[4]));
+					if (CorrectIndexesOverride == 1)
+					{
+						printf("\nEnter correct override indexes:\n>");
+						command = CorrectIndexesPutting;
+					}
+					else
+					{
+						printf("\n Index overriding disabled.");
+						printf("\nType next command.\n>");
+					}
+					UART_pressed_enter = 0;
+				}
 				else
 				{
 					printf("\nWrong command. Please type right command.\n");
 					UART_pressed_enter = 0;
 				}
+				memset(cmdbuf,0,15);
+				uart_rcv_len_cnt=0;
+			}
+			else if (command == CorrectIndexesPutting)
+			{
+				FirstOverrideIndex = strtoul(cmdbuf, &EndFromStrtoul, 10);
+				SecondOverrideIndex = atoi(EndFromStrtoul);
+				printf("\n FirstCorrectIndex = %u", FirstOverrideIndex);
+				printf("\n SecondCorrectIndex = %u", SecondOverrideIndex);
+				printf("\nType next command.\n>");
+				UART_pressed_enter = 0;
+				command = none;
 				memset(cmdbuf,0,15);
 				uart_rcv_len_cnt=0;
 			}

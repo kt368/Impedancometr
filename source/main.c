@@ -19,7 +19,7 @@ extern uint32_t i2s_fifo[8];
 extern uint32_t ADCnumber;
 extern uint8_t os;
 extern uint8_t I2S_complete;
-extern uint8_t pCorrectIndexes[2];
+extern uint16_t pCorrectIndexes[2];
 
 	int main (void) {
 		

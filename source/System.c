@@ -29,6 +29,10 @@ struct CalData_struct* CalDataCalibr;
 																		
 uint16_t pCorrectIndexes[2] = {0, 0};
 
+uint8_t CorrectIndexesOverride;
+uint16_t FirstOverrideIndex;
+uint16_t SecondOverrideIndex;
+
 /*********************************************************************//**
 * @brief        Run ADC conversion on selected chanel several times and return average value
 * @param[in]    ADCx pointer to LPC_ADC_TypeDef, should be: LPC_ADC
@@ -62,7 +66,7 @@ uint16_t pCorrectIndexes[2] = {0, 0};
 		uint_fast8_t i, j, data_true, ADCInProgress=1;
 		uint64_t SumAbs=0,SumPh=0;
 		uint32_t MeanAbs, MeanPh;
-		uint32_t temp = 0, temp2 = 0, temp3 = 0, temp4, temp5, adc_abs_counter=0, adc_ph_counter=0;
+		uint32_t temp2 = 0, temp3 = 0, adc_abs_counter=0, adc_ph_counter=0;
 		
 		//Измерение необходимого сдвига PCM сигнала - он почему-то плавает
 		for (sdvig=5;sdvig<9;sdvig++)
@@ -113,8 +117,6 @@ uint16_t pCorrectIndexes[2] = {0, 0};
 				i2s_fifo_buf[6]=i2s_fifo[6];
 				i2s_fifo_buf[7]=i2s_fifo[7];
 				I2S_complete=0;
-				temp4 = i2s_fifo_buf[0];
-				temp5 = i2s_fifo_buf[1];
 				for (i=0;i<8;i++)
 				{
 					i2s_fifo_buf[i] = i2s_fifo_buf[i] >> sdvig;
@@ -305,8 +307,6 @@ PT_THREAD(Calibration(struct pt *pt))
 	
 //declaration of external struct
 	extern mag_ph_calc_calibr_struct_t MagPhcT_st;
-	//declaration of pointer to external struct
-	static mag_ph_calc_calibr_struct_t *pCalibrateMagPhaseCalcTheoretic_st=&MagPhcT_st;
 	//declaration of external function, which receibe pointer to external struct
 	extern void CalibrateMagPhaseCalcTheoretic(mag_ph_calc_calibr_struct_t *st);
 	
@@ -701,15 +701,22 @@ int compare_structs_on_float_Z_and_iZ(const void *arg1, const void *arg2)
 
 float GetRealZ_on_F_iZ1_iZ2_for_Z(uint16_t freq, uint16_t iZ1, uint16_t iZ2, uint16_t Z)
 {
-	float Z_coef_low_freq, Z_coef_high_freq, ret, Z1lf, Z1hf, Z2lf, Z2hf, magph[2];
-	
-	Z_coef_low_freq = ((float)((int32_t)Z - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin].mag)))/((float)((int32_t)CalData[iZ2].Zarray[freq_index - CalData[iZ2].nFmin].mag - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin].mag)));
+	float Z_coef_low_freq, Z_coef_high_freq, Z1lf, Z1hf, Z2lf, Z2hf, magph[2];
+	if (iZ1 != iZ2)
+		{
+			Z_coef_low_freq = ((float)((int32_t)Z - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin].mag)))/((float)((int32_t)CalData[iZ2].Zarray[freq_index - CalData[iZ2].nFmin].mag - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin].mag)));
+			Z_coef_high_freq = ((float)((int32_t)Z - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin + 1].mag)))/((float)((int32_t)CalData[iZ2].Zarray[freq_index - CalData[iZ2].nFmin + 1].mag - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin + 1].mag)));
+		}
+		else
+		{
+			Z_coef_low_freq = 0;
+			Z_coef_high_freq = 0;
+		}
 	GetRealCalMagPh(magph, cal_freq_list[freq_index], iZ1);
 	Z1lf = 	magph[0];
 	GetRealCalMagPh(magph, cal_freq_list[freq_index], iZ2);
 	Z2lf = 	magph[0];
 	
-	Z_coef_high_freq = ((float)((int32_t)Z - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin + 1].mag)))/((float)((int32_t)CalData[iZ2].Zarray[freq_index - CalData[iZ2].nFmin + 1].mag - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin + 1].mag)));
 	GetRealCalMagPh(magph, cal_freq_list[freq_index+1], iZ1);
 	Z1hf = 	magph[0];
 	GetRealCalMagPh(magph, cal_freq_list[freq_index+1], iZ2);
@@ -720,15 +727,22 @@ float GetRealZ_on_F_iZ1_iZ2_for_Z(uint16_t freq, uint16_t iZ1, uint16_t iZ2, uin
 
 float GetRealPH_on_F_iZ1_iZ2_for_PH(uint16_t freq, uint16_t iZ1, uint16_t iZ2, uint16_t PH)
 {
-	float PH_coef_low_freq, PH_coef_high_freq, ret, PH1lf, PH1hf, PH2lf, PH2hf, magph[2];
-	
-	PH_coef_low_freq = ((float)((int32_t)PH - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin].ph)))/((float)((int32_t)CalData[iZ2].Zarray[freq_index - CalData[iZ2].nFmin].ph - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin].ph)));
+	float PH_coef_low_freq, PH_coef_high_freq, PH1lf, PH1hf, PH2lf, PH2hf, magph[2];
+	if (iZ1 != iZ1)
+		{
+			PH_coef_low_freq = ((float)((int32_t)PH - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin].ph)))/((float)((int32_t)CalData[iZ2].Zarray[freq_index - CalData[iZ2].nFmin].ph - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin].ph)));
+			PH_coef_high_freq = ((float)((int32_t)PH - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin + 1].ph)))/((float)((int32_t)CalData[iZ2].Zarray[freq_index - CalData[iZ2].nFmin + 1].ph - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin + 1].ph)));
+		}
+		else
+		{
+			PH_coef_low_freq = 0;
+			PH_coef_high_freq = 0;
+		}
 	GetRealCalMagPh(magph, cal_freq_list[freq_index], iZ1);
 	PH1lf = 	magph[1];
 	GetRealCalMagPh(magph, cal_freq_list[freq_index], iZ2);
 	PH2lf = 	magph[1];
 	
-	PH_coef_high_freq = ((float)((int32_t)PH - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin + 1].ph)))/((float)((int32_t)CalData[iZ2].Zarray[freq_index - CalData[iZ2].nFmin + 1].ph - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin + 1].ph)));
 	GetRealCalMagPh(magph, cal_freq_list[freq_index+1], iZ1);
 	PH1hf = 	magph[1];
 	GetRealCalMagPh(magph, cal_freq_list[freq_index+1], iZ2);
@@ -800,7 +814,7 @@ float GetCalZ_on_F_iZ (uint16_t iZ, uint16_t freq)
 	{
 		t1 = GetCalZ_on_iZ_iF(iZ, freq_index);
 		t2 = GetCalZ_on_iZ_iF(iZ, freq_index+1);
-		ret = t1 + (t2 - t1) * f_coef;;
+		ret = t1 + (t2 - t1) * f_coef;
 	}
 	else ret = GetCalZ_on_iZ_iF(iZ, freq_index);
 	//Проверка, входит ли частота freq в калибровочные диапазоны частот для нагрузки iZ
@@ -816,7 +830,7 @@ float GetCalZ_on_F_iZ (uint16_t iZ, uint16_t freq)
 	return ret;
 }
 
-uint32_t GetCalPH_on_iZ_iF (uint16_t iZ, uint8_t iF)
+uint32_t GetCalPH_on_iZ_iF (uint16_t iZ, uint8_t freq_index)
 {
 	if (freq_index > (CalData[iZ].nFmax - 1))
 	{
@@ -947,13 +961,8 @@ void Measure(float results[2], uint16_t freq)
 	
 	uint32_t temp_adc;
 
-	float z_coef_1, z_coef_2, ph_coef_1, ph_coef_2;
-	
 	float Zmin_on_cur_F, Zmax_on_cur_F;
-	float ZcalOnLowFreqLowIndex, ZcalOnLowFreqHighIndex, ZcalOnHighFreqLowIndex, ZcalOnHighFreqHighIndex;
-	float ZmeasuredOnLowFreqLowIndex, ZmeasuredOnLowFreqHighIndex, ZmeasuredOnHighFreqLowIndex, ZmeasuredOnHighFreqHighIndex;
-	float PHcalOnLowFreqLowIndex, PHcalOnLowFreqHighIndex, PHcalOnHighFreqLowIndex, PHcalOnHighFreqHighIndex;
-	float PHmeasuredOnLowFreqLowIndex, PHmeasuredOnLowFreqHighIndex, PHmeasuredOnHighFreqLowIndex, PHmeasuredOnHighFreqHighIndex;
+
 	
 	temp_adc = ADC_RUN(os);
 	ph = (uint16_t)((temp_adc & 0xffff0000) >> 16);
@@ -962,6 +971,7 @@ void Measure(float results[2], uint16_t freq)
 	if (freq < cal_freq_list[nF_cal-1])
 	//Если текущая измерительная частота не равна максимальной калибровочной частоте
 	{
+		freq_index = 0;
 		while (cal_freq_list[freq_index] <= freq)
 		{
 			freq_index++;
@@ -1018,6 +1028,11 @@ void Measure(float results[2], uint16_t freq)
 			//Найти индексы кривых, по которым будем корректировать
 
 			GetCorrectIndexes(pCorrectIndexes, freq, mag, ph);
+			if (CorrectIndexesOverride == 1)
+			{
+				pCorrectIndexes[0] = FirstOverrideIndex;
+				pCorrectIndexes[1] = SecondOverrideIndex;
+			}
 			
 			if (debug_mode==1)
 			{
@@ -1031,55 +1046,10 @@ void Measure(float results[2], uint16_t freq)
 			//!!!!!!!!!!!!!Вот тут самы корректировка Среднее значение значений, откалиброванных по четырем точкам - частота выше,
 			//частота ниже, модуль импеданса выше и модуль импеданса ниже
 
-// Сначала разберемся с модулем импеданса:
 			results[0] = GetRealZ_on_F_iZ1_iZ2_for_Z(freq, pCorrectIndexes[0], pCorrectIndexes[1], mag);
 			results[1] = GetRealPH_on_F_iZ1_iZ2_for_PH(freq, pCorrectIndexes[0], pCorrectIndexes[1], ph);
 		}
 	}
-//	else
-//	//Если текущая измерительная частота равна максимальной калибровочной частоте
-//	{
-//		freq_index = nF_cal - 1;
-////		SortZIndOnCurF (pIndZwith_uint_Z, freq);
-//		//Отсоритруем массив структур модулей калибровочных нагрузок и их индексов на данной частоте.
-//		
-//		I_Zcal_min_1 = Calc_iZ_for_Min_Z_OnCur_iF(freq_index);
-//		//I_Zcal_min_1 это индекс калибровочной нагрузки, показавшей минимальный импеданс на частоте с индексом freq_index
-//		I_Zcal_max_1 = Calc_iZ_for_Max_Z_OnCur_iF(freq_index);
-//		//I_Zcal_min_1 это индекс калибровочной нагрузки, показавшей максимальный импеданс на частоте с индексом freq_index
-//		
-//		Zmin_on_cur_F = GetCalZ_on_iZ_iF(I_Zcal_min_1, freq_index);
-//		//Zmin_on_cur_F это минимальное значение АЦП, полученное при калибровке на максимальной частоте.
-//		
-//		Zmax_on_cur_F = GetCalZ_on_iZ_iF(I_Zcal_max_1, freq_index);
-//		//Zmax_on_cur_F это максимальное значение АЦП, полученное при калибровке на максимальной частоте.
-//		
-//		if (mag >= Zmax_on_cur_F)
-//		{
-//			results[0] = GetRealZ_on_F_iZ_for_Z(freq, I_Zcal_max_1, mag);
-//		}
-//		else if (mag <= Zmin_on_cur_F)
-//		{
-//			results[0] = GetRealZ_on_F_iZ_for_Z(freq, I_Zcal_min_1, mag);
-//		}
-//		else	//Если существует такая калибровочная нагрузка, которая на текущей частоте имеет меньший импеданс,
-//					// чем mag, и такая калибровочная нагрузка, которая на текущей частоте имеет больший импеданс, чем mag.
-//					//По-сути здесь идет основная обработка измеренных данных на максимальной калибровочной частоте
-//		{
-//			//Найти индексы кривых, по которым будем корректировать
-//			GetCorrectIndexes(pCorrectIndexes, freq, mag, ph);
-//			//!!!!!!!!!!!!!Вот тут самы корректировка. Среднее значение значений, откалиброванных по двум точкам:
-//			//модуль импеданса выше и модуль импеданса ниже
-//			
-//			z_coef_1 = (mag - GetCalZ_on_iZ_iF(pCorrectIndexes[0], freq_index)) / (GetCalZ_on_iZ_iF(pCorrectIndexes[1], freq_index) - GetCalZ_on_iZ_iF(pCorrectIndexes[0], freq_index));
-//			// z_coef_1 - коэффициент, определяющий расположение модуля mag измеренного импеданса между ближайшими кривыми (найденными
-//			// выше в функции GetCorrectIndexes. Определяестя расположение на частоте freq_index - нижней частоте диапазона, в
-//			// который попадает измерительная частота freq.
-//			
-//			results[0] = (z_coef_1*(mag*CalData[pCorrectIndexes[0]].Zarray[freq_index].k+CalData[pCorrectIndexes[0]].Zarray[freq_index].b) + (1-z_coef_1)*(mag*CalData[pCorrectIndexes[1]].Zarray[freq_index].k+CalData[pCorrectIndexes[1]].Zarray[freq_index].b));
-//		}
-//	}
-	//free(pIndZwith_uint_Z);
 }
 
 void GetCorrectIndexes(uint16_t* pCorrectIndexes, uint16_t freq, float mag, float ph)
@@ -1087,8 +1057,9 @@ void GetCorrectIndexes(uint16_t* pCorrectIndexes, uint16_t freq, float mag, floa
 	//Нужно выбрать две калибровочные кривые так, чтобы модули импедансов этих калибровочных кривых были по разные
 	//стороны от измеренного модуля импеданса и для которых сумма модулей отклонений в процентах 
 	//модуля измеренного импеданса и его фазы от калибровочных для данных кривых были минимальные
-	uint8_t counter1 = 1, counter2 = 1;
+	uint8_t counter, success = 0;
 	uint16_t i;
+	uint16_t SecondDeriviate;
 	
 	struct IndZwith_float_Z_str * IndZwith_float_Z;
 	
@@ -1102,78 +1073,109 @@ void GetCorrectIndexes(uint16_t* pCorrectIndexes, uint16_t freq, float mag, floa
 	
 	//Сортируем полученны массив структур
 	qsort((void*)IndZwith_float_Z, nZ_cal, sizeof(struct IndZwith_float_Z_str), compare_structs_on_float_Z_and_iZ);
-	//!!!!!!!!!!!!!!!!порядок?????????????????
+	
 	pCorrectIndexes[0] = IndZwith_float_Z[0].iZ;//Пусть первый индекс будет pIndZwithOtkl[0].iZ
-	if (GetCalZ_on_F_iZ(pCorrectIndexes[0], freq)< mag)
+	
+	if (IndZwith_float_Z[0].Z * 10 < IndZwith_float_Z[1].Z)
 	{
-		while(1)
-		{
-			if (GetCalZ_on_F_iZ(IndZwith_float_Z[counter1].iZ, freq) > mag)
-			{
-				pCorrectIndexes[1] = IndZwith_float_Z[counter1].iZ;
-				break;
-			}
-			counter1++;
-			if (counter1 == 8)
-				while(1)
-				{
-					if ( (GetCalZ_on_F_iZ(IndZwith_float_Z[counter2].iZ, freq) > mag) && ( ( (GetCalPH_on_F_iZ(IndZwith_float_Z[counter2].iZ, freq) > ph) && (GetCalPH_on_F_iZ(IndZwith_float_Z[0].iZ, freq) < ph) ) || ( (GetCalPH_on_F_iZ(IndZwith_float_Z[counter2].iZ, freq) < ph) && (GetCalPH_on_F_iZ(IndZwith_float_Z[0].iZ, freq) > ph) ) ) )
-					{
-						pCorrectIndexes[1] = IndZwith_float_Z[counter2].iZ;
-						break;
-					}
-					counter2++;
-					if (counter2 == 5)
-					{
-						pCorrectIndexes[1] = IndZwith_float_Z[1].iZ;  //Если нормальных кривых поблизости нет, то
-																													//пусть второй индекс будет pIndZwithOtkl[1].iZ
-						break;
-					}
-				}
-				break;
-		}
+		pCorrectIndexes[1] = pCorrectIndexes[0];
 	}
 	else
 	{
-		while(1)
+	if (GetCalZ_on_F_iZ(pCorrectIndexes[0], freq)< mag)
 		{
-			if (GetCalZ_on_F_iZ(IndZwith_float_Z[counter1].iZ, freq) < mag)
+			for (counter = 2;counter < 5; counter++)
 			{
-				pCorrectIndexes[1] = IndZwith_float_Z[counter1].iZ;
-				break;
+				if ( (GetCalZ_on_F_iZ(IndZwith_float_Z[counter].iZ, freq) > mag) && ( ( (GetCalPH_on_F_iZ(IndZwith_float_Z[counter].iZ, freq) > ph) && (GetCalPH_on_F_iZ(IndZwith_float_Z[0].iZ, freq) < ph) ) || ( (GetCalPH_on_F_iZ(IndZwith_float_Z[counter].iZ, freq) < ph) && (GetCalPH_on_F_iZ(IndZwith_float_Z[0].iZ, freq) > ph) ) ) )
+					{
+						pCorrectIndexes[1] = IndZwith_float_Z[counter].iZ;
+						SecondDeriviate = IndZwith_float_Z[counter].Z;
+						success = 1;
+						if (debug_mode==1)
+							{
+								printf("\nCorrect index 2 count on Map Ph = %u", counter);
+							}
+						break;
+					}
 			}
-			counter1++;
-			if (counter1 == 8)
-				while(1)
+			if (success != 1)
+			{
+				for (counter = 2;counter < 5; counter++)
 				{
-					if ( (GetCalZ_on_F_iZ(IndZwith_float_Z[counter2].iZ, freq) < mag) && ( ( (GetCalPH_on_F_iZ(IndZwith_float_Z[counter2].iZ, freq) > ph) && (GetCalPH_on_F_iZ(IndZwith_float_Z[0].iZ, freq) < ph) ) || ( (GetCalPH_on_F_iZ(IndZwith_float_Z[counter2].iZ, freq) < ph) && (GetCalPH_on_F_iZ(IndZwith_float_Z[0].iZ, freq) > ph) ) ) )
-					{
-						pCorrectIndexes[1] = IndZwith_float_Z[counter2].iZ;
-						break;
-					}
-					counter2++;
-					if (counter2 == 5)
-					{
-						pCorrectIndexes[1] = IndZwith_float_Z[1].iZ;  //Если нормальных кривых поблизости нет, то
-																													//пусть второй индекс будет pIndZwithOtkl[1].iZ
-						break;
-					}
+					if ( GetCalZ_on_F_iZ(IndZwith_float_Z[counter].iZ, freq) > mag )
+						{
+							pCorrectIndexes[1] = IndZwith_float_Z[counter].iZ;
+							SecondDeriviate = IndZwith_float_Z[counter].Z;
+							success = 1;
+							if (debug_mode==1)
+							{
+								printf("\nCorrect index 2 count on Map = %u", counter);
+							}
+							break;
+						}
 				}
-				break;
+			}
+			if (success != 1)
+			{
+				pCorrectIndexes[1] = pCorrectIndexes[0];
+				SecondDeriviate = IndZwith_float_Z[0].Z;
+			}
+		}
+		else
+		{
+			for (counter = 2;counter < 5; counter++)
+			{
+				if ( (GetCalZ_on_F_iZ(IndZwith_float_Z[counter].iZ, freq) < mag) && ( ( (GetCalPH_on_F_iZ(IndZwith_float_Z[counter].iZ, freq) > ph) && (GetCalPH_on_F_iZ(IndZwith_float_Z[0].iZ, freq) < ph) ) || ( (GetCalPH_on_F_iZ(IndZwith_float_Z[counter].iZ, freq) < ph) && (GetCalPH_on_F_iZ(IndZwith_float_Z[0].iZ, freq) > ph) ) ) )
+					{
+						pCorrectIndexes[1] = IndZwith_float_Z[counter].iZ;
+						SecondDeriviate = IndZwith_float_Z[counter].Z;
+						success = 1;
+						if (debug_mode==1)
+							{
+								printf("\nCorrect index 2 count on Map Ph = %u", counter);
+							}
+						break;
+					}
+			}
+			if (success != 1)
+			{
+				for (counter = 2;counter < 5; counter++)
+				{
+					if ( GetCalZ_on_F_iZ(IndZwith_float_Z[counter].iZ, freq) < mag )
+						{
+							pCorrectIndexes[1] = IndZwith_float_Z[counter].iZ;
+							SecondDeriviate = IndZwith_float_Z[counter].Z;
+							success = 1;
+							if (debug_mode==1)
+							{
+								printf("\nCorrect index 2 count on Map = %u", counter);
+							}
+							break;
+						}
+				}
+			}
+			if (success != 1)
+			{
+				pCorrectIndexes[1] = pCorrectIndexes[0];
+				SecondDeriviate = IndZwith_float_Z[0].Z;
+			}
 		}
 	}
-//	if ((IndZwith_float_Z[1].Z / IndZwith_float_Z[0].Z) > 5)
-//	{
-//		pCorrectIndexes[1] = IndZwith_float_Z[0].iZ;
-//	}
-//	else
-//	{
-//		pCorrectIndexes[1] = IndZwith_float_Z[1].iZ;
-//	}
+	
+	if ( ( GetMagOtkl(mag, freq, pCorrectIndexes[1]) / GetMagOtkl(mag, freq, IndZwith_float_Z[1].iZ) > 5 ) || ( GetPhOtkl(ph, freq, pCorrectIndexes[1]) / GetPhOtkl(ph, freq, IndZwith_float_Z[1].iZ) > 5 ) )
+	{
+		pCorrectIndexes[1] = IndZwith_float_Z[0].iZ;
+	}
+	
+	if (debug_mode==1)
+		{
+			printf("\npSortedCurvesIndexesDeviation:\n%6.6f %6.6f %6.6f %6.6f %6.6f %6.6f %6.6f", IndZwith_float_Z[0].Z, IndZwith_float_Z[1].Z, IndZwith_float_Z[2].Z, IndZwith_float_Z[3].Z, IndZwith_float_Z[4].Z, IndZwith_float_Z[5].Z, IndZwith_float_Z[6].Z);
+			printf("\npSortedCurvesIndexes:\n%u %u %u %u %u %u %u", IndZwith_float_Z[0].iZ, IndZwith_float_Z[1].iZ, IndZwith_float_Z[2].iZ, IndZwith_float_Z[3].iZ, IndZwith_float_Z[4].iZ, IndZwith_float_Z[5].iZ, IndZwith_float_Z[6].iZ);
+			printf("\npCorrectIndexesDeviation = %f %u", IndZwith_float_Z[0].Z, SecondDeriviate);
+		}
 	free(IndZwith_float_Z);
 }
-
-
+		
 /*********************************************************************//**
 * @brief        	Функция рассчитывает сумму модулей отклонений в процентах/100 модуля измеренного импеданса и его
 									фазы от калибровочных калибровочной кривой с индексом iZ
@@ -1189,14 +1191,28 @@ float GetSumOtkl(float mag, float ph, uint16_t freq, uint16_t iZ)
 	float cal;
 
 	cal = GetCalZ_on_F_iZ (iZ, freq);
-	ret = fabs((cal-mag)/((float)mag));
+	ret = fabs(cal-mag)/sqrtf(mag);
 	cal = GetCalPH_on_F_iZ (iZ, freq);
-	cal = fabs((cal-ph)/((float)ph));
-	ret = ret + cal/5; // Уменьшаем чувствительность суммы модулей отклонений от фазы
+	cal = fabs(cal-ph)/sqrtf(ph);
+	ret = ret + cal/1; // Уменьшаем чувствительность суммы модулей отклонений от фазы
 	return ret;
 }
+float GetMagOtkl(float mag, uint16_t freq, uint16_t iZ)
+{
+	float ret;
 
+	ret = GetCalZ_on_F_iZ (iZ, freq);
+	ret = fabs(ret-mag);
+	return ret;
+}
+float GetPhOtkl(float ph, uint16_t freq, uint16_t iZ)
+{
+	float ret;
 
+	ret = GetCalPH_on_F_iZ (iZ, freq);
+	ret = fabs(ret-ph);
+	return ret;
+}
 /*********************************************************************//**
 * @brief        	Задержка на указанное количество миллисекунд
 	@param[t]				Задержка в мс
@@ -1270,7 +1286,7 @@ struct PrepareStructForZcal_str GetPrepareStructForZcal (void)
 
 void GetRealCalMagPh(float result[2], uint16_t freq, uint16_t iZ)
 {
-	float C, Rp, Rs, Rt, Rb, a, b, real, imag;
+	float C, Rp, Rs, a, b, real, imag;
 	
 	C = CalData[iZ].C;
 	Rp = CalData[iZ].Rp;
@@ -1279,7 +1295,7 @@ void GetRealCalMagPh(float result[2], uint16_t freq, uint16_t iZ)
 	Rb = CalData[iZ].Rb;
 	a = 2 * 3.1415926 * freq * 1000 * C * 0.000000000001 * (Rp + Rs);
 	b = 2 * 3.1415926 * freq * 1000 * C * 0.000000000001 * Rp * Rs;
-	real = Rt + Rb + (Rp + a*b)/(1+a*a);	//действит. часть импеданса
+	real = (Rp + a*b)/(1+a*a);	//действит. часть импеданса
 	imag = (b - Rp * a) / (1 + a * a);													  //мнимая часть импеданса
 	result[0] = sqrt(powf(real,2)+powf(imag,2));															//модуль импеданса
 	result[1] = atanf(imag/real);																							//фаза импеданса

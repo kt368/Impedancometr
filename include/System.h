@@ -28,6 +28,7 @@
 #define f					9
 #define BADKEY		-1
 #define	none			0
+#define CorrectIndexesPutting 1
 
 //Definitions of UART state
 #define enter			1
@@ -65,8 +66,8 @@ struct CalData_struct {	//Size 8*32 bit = 8*4 bytes = 32 byte
 												//We have nFmax - nFmin sets of calibrating coefficients
 };
 
-struct IndZwith_uint_Z_str {uint16_t Z; uint8_t iZ;};
-struct IndZwith_float_Z_str {float Z; uint8_t iZ;};
+struct IndZwith_uint_Z_str {uint16_t Z; uint16_t iZ;};
+struct IndZwith_float_Z_str {float Z; uint16_t iZ;};
 
 // Functions definitions
 
@@ -97,6 +98,8 @@ void Measure(float results[2], uint16_t freq);
 
 void GetCorrectIndexes(uint16_t* pCorrectIndexes, uint16_t freq, float mag, float ph);
 float GetSumOtkl(float mag, float ph, uint16_t freq, uint16_t iZ);
+float GetMagOtkl(float mag, uint16_t freq, uint16_t iZ);
+float GetPhOtkl(float ph, uint16_t freq, uint16_t iZ);
 
 uint32_t GetCalZ_on_iZ_iF (uint16_t iZ, uint8_t iF);
 uint32_t GetCalPH_on_iZ_iF (uint16_t iZ, uint8_t iF);
@@ -104,13 +107,13 @@ uint32_t GetCalPH_on_iZ_iF (uint16_t iZ, uint8_t iF);
 float GetCalZ_on_F_iZ (uint16_t iZ, uint16_t freq);
 float GetCalPH_on_F_iZ (uint16_t iZ, uint16_t freq);
 
-//float GetRealZ_on_F_iZ_for_Z(uint16_t freq, uint8_t iZ, uint16_t Z);
+//float GetRealZ_on_F_iZ_for_Z(uint16_t freq, uint16_t iZ, uint16_t Z);
 float GetRealZ_on_F_iZ1_iZ2_for_Z(uint16_t freq, uint16_t iZ1, uint16_t iZ2, uint16_t Z);
 float GetRealPH_on_F_iZ1_iZ2_for_PH(uint16_t freq, uint16_t iZ1, uint16_t iZ2, uint16_t PH);
-//float GetRealZ_on_iF_iZ_for_Z (uint8_t freq_index, uint16_t Z, uint8_t iZ);
+//float GetRealZ_on_iF_iZ_for_Z (uint8_t freq_index, uint16_t Z, uint16_t iZ);
 
-//float GetRealPH_on_F_iZ_for_Z(uint16_t freq, uint8_t iZ, uint16_t PH);
-//float GetRealPH_on_iF_iZ_for_PH (uint8_t freq_index, uint16_t PH, uint8_t iZ);
+//float GetRealPH_on_F_iZ_for_Z(uint16_t freq, uint16_t iZ, uint16_t PH);
+//float GetRealPH_on_iF_iZ_for_PH (uint8_t freq_index, uint16_t PH, uint16_t iZ);
 
 void wait (uint32_t t);
 struct PrepareStructForZcal_str GetPrepareStructForZcal (void);
