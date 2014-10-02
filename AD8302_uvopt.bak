@@ -166,7 +166,56 @@
           <Name>-O463 -S0 -C0 -FO7  -FN1 -FC800 -FD10000000 -FF0LPC_IAP_512 -FL040000 -FS00</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>1167</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>23728</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>.\source\System.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\AD8302\source/System.c\1167</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>1159</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>23634</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>.\source\System.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\AD8302\source/System.c\1159</Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
+          <LineNumber>1120</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>23260</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>.\source\System.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\AD8302\source/System.c\1120</Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -202,6 +251,21 @@
           <count>6</count>
           <WinNumber>1</WinNumber>
           <ItemText>CalData[iZ].Zarray[freq_index + 1 - CalData[iZ].nFmin].ph</ItemText>
+        </Ww>
+        <Ww>
+          <count>7</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>pCorrectIndexes[0],0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>8</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>FirstOverrideIndex</ItemText>
+        </Ww>
+        <Ww>
+          <count>9</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>SecondOverrideIndex</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>

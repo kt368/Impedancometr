@@ -19,15 +19,16 @@ extern uint32_t i2s_fifo[8];
 extern uint32_t ADCnumber;
 extern uint8_t os;
 extern uint8_t I2S_complete;
-extern uint16_t pCorrectIndexes[2];
+extern uint16_t pMagCI[2];
+extern uint16_t pPHCI[2];
 
 	int main (void) {
 		
 	PINSEL_CFG_Type PinCfg;
-	static uint32_t counter, adc_counter_mag=0, adc_counter_ph=0;
-	static uint64_t sum=0, sum2=0, sum_ph;
-	static float sko, sko_temp, sko_ph;
-	uint8_t data_true = 0, StopFlag=0, mean_sko_mag=1, mean_sko_ph=1;
+	static uint32_t adc_counter_mag=0, adc_counter_ph=0;
+	static uint64_t sum=0, sum_ph;
+	static float sko, sko_ph;
+	uint8_t data_true = 0, mean_sko_mag=1, mean_sko_ph=1;
 	uint32_t mean, mean_ph;
 	
 	volatile uint32_t temp_var=0, ff=10000;
@@ -35,16 +36,16 @@ extern uint16_t pCorrectIndexes[2];
 	static uint16_t frequency=1;
 	float results[2];
 	volatile uint32_t temp, temp2;
-	uint64_t temp64;
 	volatile float result=0;
 	volatile float temp3;
-	I2S_CFG_Type ConfigStruct;
 	extern uint8_t StartADC,StartADC_mag,StartADC_ph;
 	uint32_t i=0;
 	uint_fast8_t j;
 	extern uint_fast8_t sdvig;
 	uint8_t sdvig_izmer_complete=0;
 	extern uint8_t debug_mode;
+	extern uint16_t mag;
+	extern uint16_t ph;
 	
 	uint16_t i_F;
 	volatile uint32_t i2s_fifo_buf[8];
@@ -252,8 +253,8 @@ extern uint16_t pCorrectIndexes[2];
 		if (bg_flag == 1)
 		{
 				printf("\n\nImpedance vs frequency data:");
-				printf("\nFrequency\tMagnitude\tPhase");
-				printf("\nkHz\t\tOhm\t\tdegree\n");
+				printf("\nFreq\tMag\tPh\tADCmag\tADCph\tsdvig\tmagCI\t\tphCI");
+				printf("\nkHz\tOhm\tdegree\n");
 				for (i_F = 0; i_F < n_F; i_F++)
 				{
 					frequency = (f_min+(uint32_t)(f_max-f_min)*(uint32_t)i_F/n_F);
@@ -261,12 +262,16 @@ extern uint16_t pCorrectIndexes[2];
 					AD9833_Start();
 					wait(10);
 					Measure(results, frequency);
-					printf("\n%6u\t\t", frequency);
-					printf("%6.1f\t\t", results[0]);
-					printf("%6.2f\t\t", results[1]*57.295779513);
-					printf("%5u", sdvig);
-					printf("%5u", pCorrectIndexes[0]);
-					printf("%5u", pCorrectIndexes[1]);
+					printf("\n%6u\t", frequency);
+					printf("%6.1f\t", results[0]);
+					printf("%6.2f\t", results[1]*57.295779513);
+					printf("%6u\t", mag);
+					printf("%6u\t", ph);
+					printf("%2u", sdvig);
+					printf("%4u", pMagCI[0]);
+					printf("%4u", pMagCI[1]);
+					printf("%4u", pPHCI[0]);
+					printf("%4u", pPHCI[1]);
 					//printf("%u\n", SW_UART_FIFO_STRUCT.count);
 				}
 				printf("\nType next command.\n>");
