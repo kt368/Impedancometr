@@ -1053,78 +1053,32 @@ void GetCorrectIndexes(uint16_t* pMagCI, uint16_t* pPHCI, uint16_t freq, float m
 {
 	uint16_t i;
 	
-	struct IndZwith_uint_Z_str * IndZwith_uint_Z;
+	struct IndZwith_float_Z_str * IndZwith_float_Z;
 	
-	IndZwith_uint_Z = malloc(sizeof(struct IndZwith_float_Z_str)*nZ_cal);
+	IndZwith_float_Z = malloc(sizeof(struct IndZwith_float_Z_str)*nZ_cal);
 	
 	for (i = 0; i < nZ_cal; i++)
 	{
-		IndZwith_uint_Z[i].iZ = i;
-		IndZwith_uint_Z[i].Z = abs(GetCalZ_on_F_iZ (i, freq) - mag);
+		IndZwith_float_Z[i].iZ = i;
+		IndZwith_float_Z[i].Z = GetSumOtkl(mag, ph, freq, i);;
 	}
 	
 	//Сортируем полученны массив структур
-	qsort((void*)IndZwith_uint_Z, nZ_cal, sizeof(IndZwith_uint_Z), compare_structs_on_uint_Z_and_iZ);
+	qsort((void*)IndZwith_float_Z, nZ_cal, sizeof(struct IndZwith_float_Z_str), compare_structs_on_float_Z_and_iZ);
 	
-	pMagCI[0] = IndZwith_uint_Z[0].iZ;//Пусть первый индекс будет pIndZwithOtkl[0].iZ
-	i = 1;
-	if (IndZwith_uint_Z[0].Z < mag)
-	{
-		while (IndZwith_uint_Z[i].Z > mag)
-		{
-			i++;
-		}
-	}
-	else if (IndZwith_uint_Z[0].Z > mag)
-	{
-		while (IndZwith_uint_Z[i].Z < mag)
-		{
-			i++;
-		}
-	}
-	pMagCI[1] = IndZwith_uint_Z[1].iZ;
+	pMagCI[0] = IndZwith_float_Z[0].iZ;//Пусть первый индекс будет pIndZwithOtkl[0].iZ
+	pMagCI[1] = IndZwith_float_Z[1].iZ;
+	pPHCI[0] = IndZwith_float_Z[0].iZ;
+	pPHCI[1] = IndZwith_float_Z[1].iZ;
 	
 	if (debug_mode==1)
 		{
-			printf("\npSortedMagCurvesIndexesDeviation:\n%6u %6u %6u %6u %6u %6u %6u", IndZwith_uint_Z[0].Z, IndZwith_uint_Z[1].Z, IndZwith_uint_Z[2].Z, IndZwith_uint_Z[3].Z, IndZwith_uint_Z[4].Z, IndZwith_uint_Z[5].Z, IndZwith_uint_Z[6].Z);
-			printf("\npSortedCurvesIndexes:\n%6u %6u %6u %6u %6u %6u %6u %6u %6u %6u %6u %6u %6u", IndZwith_uint_Z[0].iZ, IndZwith_uint_Z[1].iZ, IndZwith_uint_Z[2].iZ, IndZwith_uint_Z[3].iZ, IndZwith_uint_Z[4].iZ, IndZwith_uint_Z[5].iZ, IndZwith_uint_Z[6].iZ, IndZwith_uint_Z[7].iZ, IndZwith_uint_Z[8].iZ, IndZwith_uint_Z[9].iZ, IndZwith_uint_Z[10].iZ, IndZwith_uint_Z[11].iZ, IndZwith_uint_Z[12].iZ);
-			printf("\npCorrectIndexesDeviation = %u %u", IndZwith_uint_Z[0].Z, IndZwith_uint_Z[i].Z);
+			printf("\npSortedMagCurvesIndexesDeviation:\n%6.3f %6.3f %6.3f %6.3f %6.3f %6.3f %6.3f", IndZwith_float_Z[0].Z, IndZwith_float_Z[1].Z, IndZwith_float_Z[2].Z, IndZwith_float_Z[3].Z, IndZwith_float_Z[4].Z, IndZwith_float_Z[5].Z, IndZwith_float_Z[6].Z);
+			printf("\npSortedCurvesIndexes:\n%4u %4u %4u %4u %4u %4u %4u %4u %4u %4u %4u %4u %4u", IndZwith_float_Z[0].iZ, IndZwith_float_Z[1].iZ, IndZwith_float_Z[2].iZ, IndZwith_float_Z[3].iZ, IndZwith_float_Z[4].iZ, IndZwith_float_Z[5].iZ, IndZwith_float_Z[6].iZ, IndZwith_float_Z[7].iZ, IndZwith_float_Z[8].iZ, IndZwith_float_Z[9].iZ, IndZwith_float_Z[10].iZ, IndZwith_float_Z[11].iZ, IndZwith_float_Z[12].iZ);
+			printf("\npCorrectIndexesDeviation = %6.3f %6.3f", IndZwith_float_Z[0].Z, IndZwith_float_Z[i].Z);
 		}
 		
-	for (i = 0; i < nZ_cal; i++)
-	{
-		IndZwith_uint_Z[i].iZ = i;
-		IndZwith_uint_Z[i].Z = abs(GetCalPH_on_F_iZ (i, freq) - ph);
-	}
-	
-	//Сортируем полученны массив структур
-	qsort((void*)IndZwith_uint_Z, nZ_cal, sizeof(IndZwith_uint_Z), compare_structs_on_uint_Z_and_iZ);
-	
-	pPHCI[0] = IndZwith_uint_Z[0].iZ;//Пусть первый индекс будет pIndZwithOtkl[0].iZ
-	i = 1;
-	if (IndZwith_uint_Z[0].Z < ph)
-	{
-		while (IndZwith_uint_Z[i].Z > ph)
-		{
-			i++;
-		}
-	}
-	else if (IndZwith_uint_Z[0].Z > ph)
-	{
-		while (IndZwith_uint_Z[i].Z < ph)
-		{
-			i++;
-		}
-	}
-	pPHCI[1] = IndZwith_uint_Z[1].iZ;
-	
-	if (debug_mode==1)
-		{
-			printf("\npSortedPhCurvesIndexesDeviation:\n%6u %6u %6u %6u %6u %6u %6u", IndZwith_uint_Z[0].Z, IndZwith_uint_Z[1].Z, IndZwith_uint_Z[2].Z, IndZwith_uint_Z[3].Z, IndZwith_uint_Z[4].Z, IndZwith_uint_Z[5].Z, IndZwith_uint_Z[6].Z);
-			printf("\npSortedCurvesIndexes:\n%6u %6u %6u %6u %6u %6u %6u %6u %6u %6u %6u %6u %6u", IndZwith_uint_Z[0].iZ, IndZwith_uint_Z[1].iZ, IndZwith_uint_Z[2].iZ, IndZwith_uint_Z[3].iZ, IndZwith_uint_Z[4].iZ, IndZwith_uint_Z[5].iZ, IndZwith_uint_Z[6].iZ, IndZwith_uint_Z[7].iZ, IndZwith_uint_Z[8].iZ, IndZwith_uint_Z[9].iZ, IndZwith_uint_Z[10].iZ, IndZwith_uint_Z[11].iZ, IndZwith_uint_Z[12].iZ);
-			printf("\npCorrectIndexesDeviation = %u %u", IndZwith_uint_Z[0].Z, IndZwith_uint_Z[1].Z);
-		}
-	free(IndZwith_uint_Z);
+	free(IndZwith_float_Z);
 }
 
 /*********************************************************************//**
