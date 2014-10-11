@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\AD8302.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\AD8302.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5040049: Last Updated: Thu Oct 02 22:17:07 2014
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5040049: Last Updated: Fri Oct 10 00:04:07 2014
 <BR><P>
 <H3>Maximum Stack Usage =        656 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1419,10 +1419,10 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> system.o(.text)
 </UL>
-<P><STRONG><a name="[10c]"></a>GetRealCalMagPh</STRONG> (Thumb, 474 bytes, Stack size 128 bytes, system.o(.text))
+<P><STRONG><a name="[10c]"></a>GetRealCalMagPh</STRONG> (Thumb, 460 bytes, Stack size 128 bytes, system.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 208<LI>Call Chain = GetRealCalMagPh &rArr; powf &rArr; __aeabi_dsub
 </UL>
-<BR>[Calls]<UL><LI><a href="#[fd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sqrt
+<BR>[Calls]<UL><LI><a href="#[d8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sqrtf
 <LI><a href="#[fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;powf
 <LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;atanf
 <LI><a href="#[eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fmul
@@ -1480,10 +1480,11 @@ Global Symbols
 <LI><a href="#[d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fadd
 </UL>
 <BR>[Called By]<UL><LI><a href="#[117]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetMagOtkl
+<LI><a href="#[115]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetCorrectIndexes
 <LI><a href="#[114]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetSumOtkl
 </UL>
 
-<P><STRONG><a name="[113]"></a>GetCalPH_on_iZ_iF</STRONG> (Thumb, 140 bytes, Stack size 0 bytes, system.o(.text))
+<P><STRONG><a name="[113]"></a>GetCalPH_on_iZ_iF</STRONG> (Thumb, 138 bytes, Stack size 0 bytes, system.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetCalPH_on_F_iZ
 </UL>
 
@@ -1497,6 +1498,7 @@ Global Symbols
 <LI><a href="#[d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fadd
 </UL>
 <BR>[Called By]<UL><LI><a href="#[118]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetPhOtkl
+<LI><a href="#[115]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetCorrectIndexes
 <LI><a href="#[114]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetSumOtkl
 </UL>
 
@@ -1517,11 +1519,15 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[115]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetCorrectIndexes
 </UL>
 
-<P><STRONG><a name="[115]"></a>GetCorrectIndexes</STRONG> (Thumb, 342 bytes, Stack size 136 bytes, system.o(.text))
+<P><STRONG><a name="[115]"></a>GetCorrectIndexes</STRONG> (Thumb, 690 bytes, Stack size 136 bytes, system.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 464 + Unknown Stack Size
 <LI>Call Chain = GetCorrectIndexes &rArr; qsort &rArr; _partition_sort
 </UL>
 <BR>[Calls]<UL><LI><a href="#[114]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetSumOtkl
+<LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetCalPH_on_F_iZ
+<LI><a href="#[110]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetCalZ_on_F_iZ
+<LI><a href="#[ff]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_cfrcmple
+<LI><a href="#[fe]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_cfcmple
 <LI><a href="#[da]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
 <LI><a href="#[116]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;qsort
 <LI><a href="#[cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
@@ -1531,7 +1537,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Measure
 </UL>
 
-<P><STRONG><a name="[dc]"></a>Measure</STRONG> (Thumb, 816 bytes, Stack size 72 bytes, system.o(.text))
+<P><STRONG><a name="[dc]"></a>Measure</STRONG> (Thumb, 728 bytes, Stack size 72 bytes, system.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 536 + Unknown Stack Size
 <LI>Call Chain = Measure &rArr; GetCorrectIndexes &rArr; qsort &rArr; _partition_sort
 </UL>
@@ -2392,8 +2398,7 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[15d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_dsqrt
 <LI><a href="#[13b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__set_errno
 </UL>
-<BR>[Called By]<UL><LI><a href="#[10c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetRealCalMagPh
-<LI><a href="#[f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetPrepareStructForZcal
+<BR>[Called By]<UL><LI><a href="#[f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetPrepareStructForZcal
 <LI><a href="#[e5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pow
 </UL>
 
@@ -2404,6 +2409,7 @@ Global Symbols
 <LI><a href="#[13b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__set_errno
 </UL>
 <BR>[Called By]<UL><LI><a href="#[114]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetSumOtkl
+<LI><a href="#[10c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetRealCalMagPh
 <LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 <LI><a href="#[ee]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;hypotf
 </UL>
@@ -2755,7 +2761,8 @@ Global Symbols
 <P><STRONG><a name="[fe]"></a>__aeabi_cfcmple</STRONG> (Thumb, 0 bytes, Stack size 16 bytes, fleqf.o(x$fpl$fleqf))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = __aeabi_cfcmple
 </UL>
-<BR>[Called By]<UL><LI><a href="#[10b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;compare_structs_on_float_Z_and_iZ
+<BR>[Called By]<UL><LI><a href="#[115]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetCorrectIndexes
+<LI><a href="#[10b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;compare_structs_on_float_Z_and_iZ
 <LI><a href="#[f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetPrepareStructForZcal
 <LI><a href="#[dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Measure
 </UL>
@@ -2816,7 +2823,8 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[ff]"></a>__aeabi_cfrcmple</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, frleqf.o(x$fpl$frleqf))
-<BR><BR>[Called By]<UL><LI><a href="#[10b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;compare_structs_on_float_Z_and_iZ
+<BR><BR>[Called By]<UL><LI><a href="#[115]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetCorrectIndexes
+<LI><a href="#[10b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;compare_structs_on_float_Z_and_iZ
 <LI><a href="#[10a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Calc_iZ_for_Max_Z_OnCur_iF
 <LI><a href="#[109]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Calc_iZ_for_Min_Z_OnCur_iF
 <LI><a href="#[f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetPrepareStructForZcal

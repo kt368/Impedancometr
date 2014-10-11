@@ -260,7 +260,7 @@ extern uint16_t pPHCI[2];
 					frequency = (f_min+(uint32_t)(f_max-f_min)*(uint32_t)i_F/n_F);
 					AD9833_SetFreq(frequency*1000);
 					AD9833_Start();
-					wait(10);
+					wait(100);
 					Measure(results, frequency);
 					printf("\n%6u\t", frequency);
 					printf("%6.1f\t", results[0]);

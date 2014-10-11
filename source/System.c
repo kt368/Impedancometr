@@ -731,7 +731,7 @@ float GetRealZ_on_F_iZ1_iZ2_for_Z(uint16_t freq, uint16_t iZ1, uint16_t iZ2, uin
 float GetRealPH_on_F_iZ1_iZ2_for_PH(uint16_t freq, uint16_t iZ1, uint16_t iZ2, uint16_t PH)
 {
 	float PH_coef_low_freq, PH_coef_high_freq, PH1lf, PH1hf, PH2lf, PH2hf, magph[2];
-	if (iZ1 != iZ1)
+	if (iZ1 != iZ2)
 		{
 			PH_coef_low_freq = ((float)((int32_t)PH - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin].ph)))/((float)((int32_t)CalData[iZ2].Zarray[freq_index - CalData[iZ2].nFmin].ph - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin].ph)));
 			PH_coef_high_freq = ((float)((int32_t)PH - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin + 1].ph)))/((float)((int32_t)CalData[iZ2].Zarray[freq_index - CalData[iZ2].nFmin + 1].ph - (int32_t)(CalData[iZ1].Zarray[freq_index - CalData[iZ1].nFmin + 1].ph)));
@@ -1065,11 +1065,78 @@ void GetCorrectIndexes(uint16_t* pMagCI, uint16_t* pPHCI, uint16_t freq, float m
 	
 	//Сортируем полученны массив структур
 	qsort((void*)IndZwith_float_Z, nZ_cal, sizeof(struct IndZwith_float_Z_str), compare_structs_on_float_Z_and_iZ);
+	// Найдем кривые, расположенные по разные стороны как в пространстве модулей, так и фаз:
+	
+	if (GetCalZ_on_F_iZ (IndZwith_float_Z[0].iZ, freq) < mag)
+	{
+		for (i = 1; i < 100; i++)
+		{
+			if (GetCalZ_on_F_iZ (IndZwith_float_Z[i].iZ, freq) > mag)
+			{
+				if (GetCalPH_on_F_iZ (IndZwith_float_Z[0].iZ, freq) < ph)
+				{
+					if (GetCalPH_on_F_iZ (IndZwith_float_Z[i].iZ, freq) > ph)
+					{
+						pMagCI[1] = IndZwith_float_Z[i].iZ;
+						break;
+					}
+				}
+				else
+				{
+					if (GetCalPH_on_F_iZ (IndZwith_float_Z[i].iZ, freq) < ph)
+					{
+						pMagCI[1] = IndZwith_float_Z[i].iZ;
+						break;
+					}
+				}
+			}
+		}
+		if (i == 100)
+		{
+			pMagCI[1] = IndZwith_float_Z[1].iZ;
+		}
+	}
+	else
+	{
+		for (i = 1; i < 100; i++)
+		{
+			if (GetCalZ_on_F_iZ (IndZwith_float_Z[i].iZ, freq) < mag)
+			{
+				if (GetCalPH_on_F_iZ (IndZwith_float_Z[0].iZ, freq) < ph)
+				{
+					if (GetCalPH_on_F_iZ (IndZwith_float_Z[i].iZ, freq) > ph)
+					{
+						pMagCI[1] = IndZwith_float_Z[i].iZ;
+						break;
+					}
+				}
+				else
+				{
+					if (GetCalPH_on_F_iZ (IndZwith_float_Z[i].iZ, freq) < ph)
+					{
+						pMagCI[1] = IndZwith_float_Z[i].iZ;
+						break;
+					}
+				}
+			}
+		}
+		if (i == 100)
+		{
+			pMagCI[1] = IndZwith_float_Z[1].iZ;
+		}
+	}
+	
+	if (debug_mode==1)
+		{
+			if (i!=100)
+			{
+				printf("\nCI might be correct :)");
+			}
+		}
 	
 	pMagCI[0] = IndZwith_float_Z[0].iZ;//Пусть первый индекс будет pIndZwithOtkl[0].iZ
-	pMagCI[1] = IndZwith_float_Z[1].iZ;
-	pPHCI[0] = IndZwith_float_Z[0].iZ;
-	pPHCI[1] = IndZwith_float_Z[1].iZ;
+	pPHCI[0] = pMagCI[0];
+	pPHCI[1] = pMagCI[1];
 	
 	if (debug_mode==1)
 		{
@@ -1202,7 +1269,7 @@ void GetRealCalMagPh(float result[2], uint16_t freq, uint16_t iZ)
 	b = 2 * 3.1415926 * freq * 1000 * C * 0.000000000001 * Rp * Rs;
 	real = (Rp + a*b)/(1+a*a);	//действит. часть импеданса
 	imag = (b - Rp * a) / (1 + a * a);													  //мнимая часть импеданса
-	result[0] = sqrt(powf(real,2)+powf(imag,2));															//модуль импеданса
+	result[0] = sqrtf(powf(real,2)+powf(imag,2));															//модуль импеданса
 	result[1] = atanf(imag/real);																							//фаза импеданса
 }
 // END OF FILE
