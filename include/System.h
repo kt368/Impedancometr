@@ -97,9 +97,9 @@ int compare_structs_on_float_Z_and_iZ(const void *arg1, const void *arg2);
 void Measure(float results[2], uint16_t freq);
 
 void GetCorrectIndexes(uint16_t* pMagCI, uint16_t* pPHCI, uint16_t freq, float mag, float ph);
-float GetSumOtkl(float mag, float ph, uint16_t freq, uint16_t iZ);
-float GetMagOtkl(float mag, uint16_t freq, uint16_t iZ);
-float GetPhOtkl(float ph, uint16_t freq, uint16_t iZ);
+float GetSumOtkl(uint16_t mag, float ph, uint16_t freq, uint16_t iZ);
+float GetMagOtkl(uint16_t mag, uint16_t freq, uint16_t iZ);
+float GetPhOtkl(uint16_t ph, uint16_t freq, uint16_t iZ);
 
 uint32_t GetCalZ_on_iZ_iF (uint16_t iZ, uint8_t iF);
 uint32_t GetCalPH_on_iZ_iF (uint16_t iZ, uint8_t iF);
