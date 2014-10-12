@@ -73,6 +73,8 @@ void UART0_IRQHandler(void)
 	uint32_t U0IIR = 0;
 	uint32_t baudrate;
 	extern uint8_t CorrectIndexesOverride;
+	extern uint8_t CorrectIndexesBrute;
+	extern uint8_t EqualIndexes;
 	extern uint16_t FirstOverrideIndex;
 	extern uint16_t SecondOverrideIndex;
 	char *EndFromStrtoul;
@@ -247,6 +249,36 @@ void UART0_IRQHandler(void)
 					else
 					{
 						printf("\n Index overriding disabled.");
+						printf("\nType next command.\n>");
+					}
+					UART_pressed_enter = 0;
+				}
+				else if (strncmp(cmdbuf, "CIB ", 4) == 0)
+				{
+					CorrectIndexesBrute = atoi(&(cmdbuf[4]));
+					if (CorrectIndexesBrute == 1)
+					{
+						printf("\n Correct calibrating curves brute forcing enabled.");
+						printf("\nType next command.\n>");
+					}
+					else
+					{
+						printf("\n Correct calibrating curves brute force disabled.");
+						printf("\nType next command.\n>");
+					}
+					UART_pressed_enter = 0;
+				}
+				else if (strncmp(cmdbuf, "EI ", 3) == 0)
+				{
+					EqualIndexes = atoi(&(cmdbuf[3]));
+					if (EqualIndexes == 1)
+					{
+						printf("\n Equal calibrating indexes for mag and phase enabled.");
+						printf("\nType next command.\n>");
+					}
+					else
+					{
+						printf("\n Equal calibrating indexes for mag and phase disabled.");
 						printf("\nType next command.\n>");
 					}
 					UART_pressed_enter = 0;

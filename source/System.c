@@ -35,8 +35,12 @@ uint16_t pMagCI[2] = {0, 0};
 uint16_t pPHCI[2] = {0, 0};
 
 uint8_t CorrectIndexesOverride;
+uint8_t CorrectIndexesBrute;
+uint8_t EqualIndexes;
 uint16_t FirstOverrideIndex;
 uint16_t SecondOverrideIndex;
+
+extern int8_t command;
 
 /*********************************************************************//**
 * @brief        Run ADC conversion on selected chanel several times and return average value
@@ -314,8 +318,7 @@ PT_THREAD(Calibration(struct pt *pt))
 	extern void CalibrateMagPhaseCalcTheoretic(mag_ph_calc_calibr_struct_t *st);
 	
 	extern uint32_t cal_freq_list[];
-	extern int8_t command;
-	
+
 	extern struct pt Calibration_pt;
 	extern char cmdbuf [15];
 	extern int uart_rcv_len_cnt;
@@ -961,11 +964,12 @@ void Measure(float results[2], uint16_t freq)
 	uint16_t	I_Zcal_max_2=0;		//»ндекс калибровочной нагрузки, имеющей максимальное сопротивление на верхней частоте диапазона
 	
 	uint32_t temp_adc;
+	uint8_t MCount;
 
 	float Zmin_on_cur_F, Zmax_on_cur_F;
 
-	
 	temp_adc = ADC_RUN(os);
+	
 	ph = (uint16_t)((temp_adc & 0xffff0000) >> 16);
 	mag = (uint16_t)(temp_adc & 0xffff);
 	
@@ -1026,25 +1030,48 @@ void Measure(float results[2], uint16_t freq)
 					//на текущей частоте имеет больший импеданс, чем mag.
 					//ѕо-сути здесь идет основна€ обработка измеренных данных
 		{
-			//Ќайти индексы кривых, по которым будем корректировать
-
-			GetCorrectIndexes(pMagCI, pPHCI, freq, mag, ph);
-			if (CorrectIndexesOverride == 1)
+			if (CorrectIndexesBrute == 1)
 			{
-				pMagCI[0] = FirstOverrideIndex;
-				pPHCI[0] = FirstOverrideIndex;
-				pMagCI[1] = SecondOverrideIndex;
-				pPHCI[1] = SecondOverrideIndex;
+				MCount = 100;
 			}
-			
-			if (debug_mode==1)
+			else
 			{
-				printf("\npMagCI = %u %u", pMagCI[0], pMagCI[1]);
-				printf("\npPHCI = %u %u", pPHCI[0], pPHCI[1]);
+				MCount = 1;
 			}
-
-			results[0] = GetRealZ_on_F_iZ1_iZ2_for_Z(freq, pMagCI[0], pMagCI[1], mag);
-			results[1] = GetRealPH_on_F_iZ1_iZ2_for_PH(freq, pPHCI[0], pPHCI[1], ph);
+			while (MCount > 0)
+			{
+				MCount--;
+				//Ќайти индексы кривых, по которым будем корректировать
+				GetCorrectIndexes(pMagCI, pPHCI, freq, mag, ph);
+				if (CorrectIndexesOverride == 1)
+				{
+					pMagCI[0] = FirstOverrideIndex;
+					pPHCI[0] = FirstOverrideIndex;
+					pMagCI[1] = SecondOverrideIndex;
+					pPHCI[1] = SecondOverrideIndex;
+				}
+				if (EqualIndexes == 1)
+				{
+					pPHCI[0] = pMagCI[0];
+					pPHCI[1] = pMagCI[1];
+				}
+				if (debug_mode==1)
+				{
+					printf("\npMagCI = %u %u", pMagCI[0], pMagCI[1]);
+					printf("\npPHCI = %u %u", pPHCI[0], pPHCI[1]);
+				}
+				results[0] = GetRealZ_on_F_iZ1_iZ2_for_Z(freq, pMagCI[0], pMagCI[1], mag);
+				results[1] = GetRealPH_on_F_iZ1_iZ2_for_PH(freq, pPHCI[0], pPHCI[1], ph);
+				
+				if (CorrectIndexesBrute == 1)
+					{
+						if (MCount == 99)
+						{
+							printf("\npMagCI[0] pMagCI[1] pPHCI[0] pPHCI[1]  mag      ph");
+						}
+						printf("\n%-9u %-9u %-8u %-9u %-7.3f %-10.3f", pMagCI[0], pMagCI[1], pPHCI[0], pPHCI[1], results[0], results[1]*57.295779513);
+					}
+			}
 		}
 	}
 }
@@ -1054,6 +1081,8 @@ void GetCorrectIndexes(uint16_t* pMagCI, uint16_t* pPHCI, uint16_t freq, float m
 	uint16_t i;
 	
 	struct IndZwith_float_Z_str * CIarray;
+	
+	static uint8_t FirstCICounter = 0, SecondCICounter = 0;
 	
 	float SKO;
 	
@@ -1188,7 +1217,7 @@ void GetCorrectIndexes(uint16_t* pMagCI, uint16_t* pPHCI, uint16_t freq, float m
 			{
 				pPHCI[1] = CIarray[1].iZ;
 			}
-		}
+	}
 	if (debug_mode==1)
 		{
 			if (i!=10)
@@ -1202,6 +1231,23 @@ void GetCorrectIndexes(uint16_t* pMagCI, uint16_t* pPHCI, uint16_t freq, float m
 			printf("\npPhSortedCurvesDeviation:\n%-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f" , CIarray[0].Z, CIarray[1].Z, CIarray[2].Z, CIarray[3].Z, CIarray[4].Z, CIarray[5].Z, CIarray[6].Z, CIarray[7].Z, CIarray[8].Z, CIarray[9].Z);
 			printf("\npPhSortedCurvesIndexes:\n%-6u %-6u %-6u %-6u %-6u %-6u %-6u %-6u %-6u %-6u", CIarray[0].iZ, CIarray[1].iZ, CIarray[2].iZ, CIarray[3].iZ, CIarray[4].iZ, CIarray[5].iZ, CIarray[6].iZ, CIarray[7].iZ, CIarray[8].iZ, CIarray[9].iZ);
 		}
+		if (CorrectIndexesBrute == 1)
+			{
+				pPHCI[0] = CIarray[FirstCICounter].iZ;
+				pPHCI[1] = CIarray[SecondCICounter].iZ;
+				
+				FirstCICounter++;
+				if (FirstCICounter == 10)
+				{
+					FirstCICounter = 0;
+					SecondCICounter++;
+					if (SecondCICounter == 10)
+					{
+						SecondCICounter = 0;
+						FirstCICounter = 0;
+					}
+				}
+			}
 	free(CIarray);
 }
 

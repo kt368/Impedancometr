@@ -3,9 +3,9 @@
 <title>Static Call Graph - [.\AD8302.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\AD8302.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5040049: Last Updated: Sun Oct 12 02:46:46 2014
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5040049: Last Updated: Sun Oct 12 21:57:46 2014
 <BR><P>
-<H3>Maximum Stack Usage =        736 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        752 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
 __rt_entry_main &rArr; main &rArr; Measure &rArr; GetCorrectIndexes &rArr; qsort &rArr; _partition_sort
 <P>
@@ -254,7 +254,7 @@ Global Symbols
 <P><STRONG><a name="[1aa]"></a>__rt_entry_postsh_1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, rtentry2.o(.ARM.Collect$$rtentry$$00000009))
 
 <P><STRONG><a name="[55]"></a>__rt_entry_main</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, rtentry2.o(.ARM.Collect$$rtentry$$0000000D))
-<BR><BR>[Stack]<UL><LI>Max Depth = 736 + Unknown Stack Size
+<BR><BR>[Stack]<UL><LI>Max Depth = 752 + Unknown Stack Size
 <LI>Call Chain = __rt_entry_main &rArr; main &rArr; Measure &rArr; GetCorrectIndexes &rArr; qsort &rArr; _partition_sort
 </UL>
 <BR>[Calls]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
@@ -1181,7 +1181,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[56]"></a>main</STRONG> (Thumb, 1650 bytes, Stack size 120 bytes, main.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 736 + Unknown Stack Size
+<BR><BR>[Stack]<UL><LI>Max Depth = 752 + Unknown Stack Size
 <LI>Call Chain = main &rArr; Measure &rArr; GetCorrectIndexes &rArr; qsort &rArr; _partition_sort
 </UL>
 <BR>[Calls]<UL><LI><a href="#[db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;wait
@@ -1563,7 +1563,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[118]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetCorrectIndexes
 </UL>
 
-<P><STRONG><a name="[118]"></a>GetCorrectIndexes</STRONG> (Thumb, 1776 bytes, Stack size 216 bytes, system.o(.text))
+<P><STRONG><a name="[118]"></a>GetCorrectIndexes</STRONG> (Thumb, 1864 bytes, Stack size 216 bytes, system.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 544 + Unknown Stack Size
 <LI>Call Chain = GetCorrectIndexes &rArr; qsort &rArr; _partition_sort
 </UL>
@@ -1590,8 +1590,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Measure
 </UL>
 
-<P><STRONG><a name="[dc]"></a>Measure</STRONG> (Thumb, 864 bytes, Stack size 72 bytes, system.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 616 + Unknown Stack Size
+<P><STRONG><a name="[dc]"></a>Measure</STRONG> (Thumb, 1008 bytes, Stack size 88 bytes, system.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 632 + Unknown Stack Size
 <LI>Call Chain = Measure &rArr; GetCorrectIndexes &rArr; qsort &rArr; _partition_sort
 </UL>
 <BR>[Calls]<UL><LI><a href="#[118]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetCorrectIndexes
@@ -1608,6 +1608,8 @@ Global Symbols
 <LI><a href="#[f5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2f
 <LI><a href="#[d9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fdiv
 <LI><a href="#[d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fadd
+<LI><a href="#[da]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
+<LI><a href="#[dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dmul
 <LI><a href="#[cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
 </UL>
 <BR>[Called By]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
@@ -1709,8 +1711,8 @@ Global Symbols
 
 <P><STRONG><a name="[1bf]"></a>SER_PutChar</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, serial.o(.text), UNUSED)
 
-<P><STRONG><a name="[19]"></a>UART0_IRQHandler</STRONG> (Thumb, 1858 bytes, Stack size 48 bytes, serial.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 664 + Unknown Stack Size
+<P><STRONG><a name="[19]"></a>UART0_IRQHandler</STRONG> (Thumb, 1998 bytes, Stack size 48 bytes, serial.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 680 + Unknown Stack Size
 <LI>Call Chain = UART0_IRQHandler &rArr; Measure &rArr; GetCorrectIndexes &rArr; qsort &rArr; _partition_sort
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_RUN
@@ -2604,6 +2606,7 @@ Global Symbols
 <LI><a href="#[f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetPrepareStructForZcal
 <LI><a href="#[f0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;logspace
 <LI><a href="#[ea]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalibrateMagPhaseCalcTheoretic
+<LI><a href="#[dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Measure
 <LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 <LI><a href="#[e5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pow
 <LI><a href="#[ef]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;atan
@@ -2693,6 +2696,7 @@ Global Symbols
 <LI><a href="#[f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetPrepareStructForZcal
 <LI><a href="#[f0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;logspace
 <LI><a href="#[ea]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalibrateMagPhaseCalcTheoretic
+<LI><a href="#[dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Measure
 <LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 <LI><a href="#[fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;powf
 <LI><a href="#[19]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_IRQHandler
