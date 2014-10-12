@@ -100,6 +100,7 @@ void GetCorrectIndexes(uint16_t* pMagCI, uint16_t* pPHCI, uint16_t freq, float m
 float GetSumOtkl(uint16_t mag, float ph, uint16_t freq, uint16_t iZ);
 float GetMagOtkl(uint16_t mag, uint16_t freq, uint16_t iZ);
 float GetPhOtkl(uint16_t ph, uint16_t freq, uint16_t iZ);
+float GetSKOMag(struct IndZwith_float_Z_str *, uint16_t);
 
 uint32_t GetCalZ_on_iZ_iF (uint16_t iZ, uint8_t iF);
 uint32_t GetCalPH_on_iZ_iF (uint16_t iZ, uint8_t iF);

@@ -1055,6 +1055,10 @@ void GetCorrectIndexes(uint16_t* pMagCI, uint16_t* pPHCI, uint16_t freq, float m
 	
 	struct IndZwith_float_Z_str * CIarray;
 	
+	float SKO;
+	
+	uint8_t FirstIndexFinded = 0, PhCI0Dest, PhCI1Dest;
+	
 	CIarray = malloc(sizeof(struct IndZwith_float_Z_str)*nZ_cal);
 	
 	for (i = 0; i < nZ_cal; i++)
@@ -1137,38 +1141,54 @@ void GetCorrectIndexes(uint16_t* pMagCI, uint16_t* pPHCI, uint16_t freq, float m
 	//Сортируем полученный массив структур отклонений фазы импеданса
 	qsort((void*)CIarray, 10, sizeof(struct IndZwith_float_Z_str), compare_structs_on_float_Z_and_iZ);
 	
+	SKO = GetSKOMag(CIarray, 10);
 	// Найдем кривые, расположенные по разные стороны в пространстве фаз импеданса
-	pPHCI[0] = CIarray[0].iZ;//Пусть первый индекс будет CIarray[0].iZ
-	if (GetCalPH_on_F_iZ (CIarray[0].iZ, freq) < ph)
+		for (i = 0; i < 10; i++)
+	{
+		if (abs(mag - GetCalZ_on_F_iZ (CIarray[i].iZ, freq)) < SKO)
 		{
-			for (i = 1; i < 10; i++)
+			if (FirstIndexFinded == 0)
 			{
-				if (GetCalPH_on_F_iZ (CIarray[i].iZ, freq) > ph)
-					{
-						pPHCI[1] = CIarray[i].iZ;
-						break;
-					}
-			}
-			if (i == 10)
+				pPHCI[0] = CIarray[i].iZ;
+				FirstIndexFinded = 1;
+				if (GetCalPH_on_F_iZ (pPHCI[0], freq) - ph > 0)
 				{
-					pPHCI[1] = CIarray[1].iZ;
+					PhCI0Dest = 1;
 				}
+				else
+				{
+					PhCI0Dest = 0;
+				}
+			}
+			else
+			{
+				if (GetCalPH_on_F_iZ (CIarray[i].iZ, freq) - ph > 0)
+				{
+					PhCI1Dest = 1;
+				}
+				else
+				{
+					PhCI1Dest = 0;
+				}
+				if (PhCI0Dest != PhCI1Dest)
+				{
+					pPHCI[1] = CIarray[i].iZ;
+					break;
+				}
+			}
 		}
 		else
+		{
+			if (i == 10)
 			{
-				for (i = 1; i < 10; i++)
-				{
-					if (GetCalPH_on_F_iZ (CIarray[i].iZ, freq) < ph)
-						{
-							pPHCI[1] = CIarray[i].iZ;
-							break;
-						}
-				}
-				if (i == 10)
-					{
-						pPHCI[1] = CIarray[1].iZ;
-					}
+				pPHCI[0] = CIarray[0].iZ;
 			}
+		}
+		if (i == 10)
+			{
+				pPHCI[1] = CIarray[1].iZ;
+			}
+		}
 	if (debug_mode==1)
 		{
 			if (i!=10)
@@ -1179,9 +1199,6 @@ void GetCorrectIndexes(uint16_t* pMagCI, uint16_t* pPHCI, uint16_t freq, float m
 					{
 						printf("\nPhase CI calibrating curves are located at one side of measured phase of impedance.");
 					}
-		}
-	if (debug_mode==1)
-		{
 			printf("\npPhSortedCurvesDeviation:\n%-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f" , CIarray[0].Z, CIarray[1].Z, CIarray[2].Z, CIarray[3].Z, CIarray[4].Z, CIarray[5].Z, CIarray[6].Z, CIarray[7].Z, CIarray[8].Z, CIarray[9].Z);
 			printf("\npPhSortedCurvesIndexes:\n%-6u %-6u %-6u %-6u %-6u %-6u %-6u %-6u %-6u %-6u", CIarray[0].iZ, CIarray[1].iZ, CIarray[2].iZ, CIarray[3].iZ, CIarray[4].iZ, CIarray[5].iZ, CIarray[6].iZ, CIarray[7].iZ, CIarray[8].iZ, CIarray[9].iZ);
 		}
@@ -1312,4 +1329,20 @@ void GetRealCalMagPh(float result[2], uint16_t freq, uint16_t iZ)
 	result[0] = sqrtf(powf(real,2)+powf(imag,2));															//модуль импеданса
 	result[1] = atanf(imag/real);																							//фаза импеданса
 }
+
+float GetSKOMag(struct IndZwith_float_Z_str * CIarray, uint16_t nZ)
+{
+	uint16_t i;
+	float ret = 0;
+	
+	for (i=0; i<nZ; i++)
+	{
+		ret += powf(GetCalZ_on_F_iZ(CIarray[i].iZ, freq) - mag, 2);
+	}
+	ret /= nZ;
+	ret = sqrtf(ret);
+	return ret;
+}
+
+
 // END OF FILE
