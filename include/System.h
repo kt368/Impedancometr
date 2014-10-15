@@ -18,6 +18,8 @@
 #define LOW									0
 #define HIGH								1
 #define nF_cal							27
+#define nCap_cal						36
+#define nPar_cal						17
 #define nZ_cal_max					1000
 
 #define CalData_var					1
@@ -136,3 +138,6 @@ uint16_t ADC_int_RUN(LPC_ADC_TypeDef *ADCx, ADC_CHANNEL_SELECTION channel, uint8
 uint32_t ADC_RUN(uint8_t n_Samples);
 
 void SaveCalData( struct CalData_struct* CalDataClibr, uint8_t stop_bit );
+
+uint8_t GetCapIndex(uint16_t cap);
+uint8_t GetParIndex(uint16_t par);

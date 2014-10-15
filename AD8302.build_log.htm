@@ -9,12 +9,22 @@ Project File Date:  09/14/2014
 <h2>Output:</h2>
 Build target 'LPC1758'
 compiling System.c...
-source\System.c(331): warning:  #550-D: variable "PT_YIELD_FLAG" was set but never used
+.\include\System.h(143): warning:  #1-D: last line of file ends without a newline
+  uint8_t GetParIndex(uint16_t par);
+source\System.c(337): warning:  #550-D: variable "PT_YIELD_FLAG" was set but never used
         PT_BEGIN(pt);
-source\System.c: 1 warning, 0 errors
+source\System.c(1093): warning:  #177-D: variable "SKO" was declared but never referenced
+        float SKO;
+source\System.c(1095): warning:  #177-D: variable "FirstIndexFinded" was declared but never referenced
+        uint8_t FirstIndexFinded = 0, PhCI0Dest, PhCI1Dest;
+source\System.c(1095): warning:  #177-D: variable "PhCI0Dest" was declared but never referenced
+        uint8_t FirstIndexFinded = 0, PhCI0Dest, PhCI1Dest;
+source\System.c(1095): warning:  #177-D: variable "PhCI1Dest" was declared but never referenced
+        uint8_t FirstIndexFinded = 0, PhCI0Dest, PhCI1Dest;
+source\System.c: 6 warnings, 0 errors
 linking...
-Program Size: Code=50264 RO-data=2896 RW-data=388 ZI-data=59564  
-".\AD8302.axf" - 0 Error(s), 1 Warning(s).
+Program Size: Code=49988 RO-data=2636 RW-data=596 ZI-data=59564  
+".\AD8302.axf" - 0 Error(s), 6 Warning(s).
 Load "D:\\Documents\\Dropbox\\Impedancometr\\AD8302.axf" 
 Set JLink Project File to "D:\Documents\Dropbox\Impedancometr\JLinkSettings.ini"
 * JLink Info: Device "LPC1758" selected (512 KB flash, 32 KB RAM).
@@ -42,15 +52,6 @@ TCK: 1, TDI: 0, TDO: 1, TMS: 0, TRES: 1, TRST: 1
 Hardware-Breakpoints: 6
 Software-Breakpoints: 8192
 Watchpoints:          4
-JTAG speed: 9600 kHz
- 
-Erase Done.
-Programming Done.
-Verify OK.
-</pre>
-</body>
-</html>
-
 JTAG speed: 9600 kHz
  
 Erase Done.
