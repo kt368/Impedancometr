@@ -4,13 +4,13 @@
 mag_ph_calc_calibr_struct_t MagPhcT_st;
 
 // Calibration frequency list in kHz
-uint32_t cal_freq_list[nF_cal] = { 10, 15, 20, 30, 40, 60, 80, 100, 120, 140, 160, 180, 200, 250, 300, 350, 400, 450, 500, 700, 1000,\
+const uint32_t cal_freq_list[nF_cal] = { 10, 15, 20, 30, 40, 60, 80, 100, 120, 140, 160, 180, 200, 250, 300, 350, 400, 450, 500, 700, 1000,\
 																		1400, 1900, 2500, 3200, 4000, 5000 };
 
-uint32_t cal_cap_list[nCap_cal] = { 0, 7, 18, 27, 39, 47, 68, 82, 100, 120, 150, 220, 268, 330, 390, 470, 560, 680, 820, 1020,\
+const uint32_t cal_cap_list[nCap_cal] = { 0, 7, 18, 27, 39, 47, 68, 82, 100, 120, 150, 220, 268, 330, 390, 470, 560, 680, 820, 1020,\
 																		1180, 1510, 1790, 2200, 2700, 3300, 3920, 4680, 5700, 6800, 8120, 9900, 12020, 15100, 18050, 22030 };
 
-uint32_t cal_par_list[nPar_cal] = { 221, 270, 328, 387, 430, 467, 510, 560, 619, 675, 748, 820, 912, 995, 1099, 1196, 1298 };
+const uint32_t cal_par_list[nPar_cal] = { 221, 270, 328, 387, 430, 467, 510, 560, 619, 675, 748, 820, 912, 995, 1099, 1196, 1298 };
 
 																		
 uint32_t C=0;
@@ -323,8 +323,6 @@ PT_THREAD(Calibration(struct pt *pt))
 	//declaration of external function, which receibe pointer to external struct
 	extern void CalibrateMagPhaseCalcTheoretic(mag_ph_calc_calibr_struct_t *st);
 	
-	extern uint32_t cal_freq_list[];
-
 	extern struct pt Calibration_pt;
 	extern char cmdbuf [15];
 	extern int uart_rcv_len_cnt;
@@ -1097,6 +1095,8 @@ void GetCorrectIndexes(uint16_t* pMagCI, uint16_t* pPHCI, uint16_t freq, float m
 	uint8_t LowCurveCapIndex;
 	uint8_t LowCurveParIndex;
 	
+	uint8_t MagUnderCalCurve;
+	
 	CIarray = malloc(sizeof(struct IndZwith_float_Z_str)*nZ_cal);
 	
 	for (i = 0; i < nZ_cal; i++)
@@ -1116,16 +1116,49 @@ void GetCorrectIndexes(uint16_t* pMagCI, uint16_t* pPHCI, uint16_t freq, float m
 
 	realloc(CIarray, sizeof(struct IndZwith_float_Z_str)*10);
 	
+	for (i = 0; i < 10; i++)
+	{
+		CIarray[i].Z = GetMagOtkl(mag, freq, CIarray[i].iZ);
+	}
+	//—ортируем полученный массив структур отклонений модул€ импеданса
+	qsort((void*)CIarray, 10, sizeof(struct IndZwith_float_Z_str), compare_structs_on_float_Z_and_iZ);
+	
 	pPHCI[0] = CIarray[0].iZ;
 	LowCurveCapIndex = GetCapIndex(CalData[pPHCI[0]].C);
 	LowCurveParIndex = GetParIndex(CalData[pPHCI[0]].Rp);
 	
+	if (mag < GetCalZ_on_F_iZ(pPHCI[0],freq))
+		{
+			MagUnderCalCurve = 1;
+		}
+		else
+		{
+			MagUnderCalCurve = 0;
+		}
+	
 	for (i = 1; i < 10; i++)
 	{
-		if ( (((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex-1)) || (GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex+1))) && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex)) ) || (((GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex+1)) || (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex-1))) && (GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex))))
+		if (MagUnderCalCurve == 1)
 		{
-			pPHCI[1] = CIarray[i].iZ;
-			break;
+			if (mag > GetCalZ_on_F_iZ(CIarray[i].iZ,freq))
+			{
+				if ( ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex-1))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex-1))) || ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex+1))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex+1))) || ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex-1))) || ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex+1))) || ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex-1))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex))) || ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex+1))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex))))
+				{
+					pPHCI[1] = CIarray[i].iZ;
+					break;
+				}
+			}
+		}
+		else
+		{
+			if (mag < GetCalZ_on_F_iZ(CIarray[i].iZ,freq))
+			{
+				if ( ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex-1))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex-1))) || ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex+1))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex+1))) || ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex-1))) || ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex+1))) || ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex-1))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex))) || ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex+1))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex))))
+				{
+					pPHCI[1] = CIarray[i].iZ;
+					break;
+				}
+			}
 		}
 	}
 	if (i == 10)
@@ -1139,13 +1172,6 @@ void GetCorrectIndexes(uint16_t* pMagCI, uint16_t* pPHCI, uint16_t freq, float m
 					printf("\nPhase CI might be correct :)");
 				}
 		}
-	
-	for (i = 0; i < 10; i++)
-	{
-		CIarray[i].Z = GetMagOtkl(mag, freq, CIarray[i].iZ);
-	}
-	//—ортируем полученный массив структур отклонений модул€ импеданса
-	qsort((void*)CIarray, 10, sizeof(struct IndZwith_float_Z_str), compare_structs_on_float_Z_and_iZ);
 	
 	// Ќайдем кривые, расположенные по разные стороны в пространстве модулей
 	pMagCI[0] = CIarray[0].iZ;//ѕусть первый индекс будет CIarray[0].iZ
