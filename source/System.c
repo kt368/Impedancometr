@@ -1088,14 +1088,8 @@ void GetCorrectIndexes(uint16_t* pMagCI, uint16_t* pPHCI, uint16_t freq, float m
 	
 	static uint8_t FirstCICounter = 0, SecondCICounter = 0;
 	
-	float SKO;
-	
-	uint8_t FirstIndexFinded = 0, PhCI0Dest, PhCI1Dest;
-	
 	uint8_t LowCurveCapIndex;
 	uint8_t LowCurveParIndex;
-	
-	uint8_t MagUnderCalCurve;
 	
 	CIarray = malloc(sizeof(struct IndZwith_float_Z_str)*nZ_cal);
 	
@@ -1108,137 +1102,115 @@ void GetCorrectIndexes(uint16_t* pMagCI, uint16_t* pPHCI, uint16_t freq, float m
 	//—ортируем полученный массив структур
 	qsort((void*)CIarray, nZ_cal, sizeof(struct IndZwith_float_Z_str), compare_structs_on_float_Z_and_iZ);
 	
+	pPHCI[0] = CIarray[0].iZ;
+	
+	LowCurveCapIndex = GetCapIndex(CalData[CIarray[0].iZ].C);
+	LowCurveParIndex = GetParIndex(CalData[CIarray[0].iZ].Rp);
+	
 	if (debug_mode==1)
 	{
 		printf("\npSortedCurvesDeviation:\n%-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f" , CIarray[0].Z, CIarray[1].Z, CIarray[2].Z, CIarray[3].Z, CIarray[4].Z, CIarray[5].Z, CIarray[6].Z, CIarray[7].Z, CIarray[8].Z, CIarray[9].Z, CIarray[10].Z);
 		printf("\npSortedCurvesIndexes:\n%-6u %-6u %-6u %-6u %-6u %-6u %-6u %-6u %-6u %-6u %-6u", CIarray[0].iZ, CIarray[1].iZ, CIarray[2].iZ, CIarray[3].iZ, CIarray[4].iZ, CIarray[5].iZ, CIarray[6].iZ, CIarray[7].iZ, CIarray[8].iZ, CIarray[9].iZ, CIarray[10].iZ);
 	}
 
-	realloc(CIarray, sizeof(struct IndZwith_float_Z_str)*10);
+	realloc(CIarray, sizeof(struct IndZwith_float_Z_str)*20);
 	
-	for (i = 0; i < 10; i++)
+	for (i = 0; i < 20; i++)
 	{
 		CIarray[i].Z = GetMagOtkl(mag, freq, CIarray[i].iZ);
 	}
 	//—ортируем полученный массив структур отклонений модул€ импеданса
-	qsort((void*)CIarray, 10, sizeof(struct IndZwith_float_Z_str), compare_structs_on_float_Z_and_iZ);
+	qsort((void*)CIarray, 20, sizeof(struct IndZwith_float_Z_str), compare_structs_on_float_Z_and_iZ);
 	
-	pPHCI[0] = CIarray[0].iZ;
-	LowCurveCapIndex = GetCapIndex(CalData[pPHCI[0]].C);
-	LowCurveParIndex = GetParIndex(CalData[pPHCI[0]].Rp);
-	
-	if (mag < GetCalZ_on_F_iZ(pPHCI[0],freq))
-		{
-			MagUnderCalCurve = 1;
-		}
-		else
-		{
-			MagUnderCalCurve = 0;
-		}
-	
-	for (i = 1; i < 10; i++)
+	for (i = 0; i < 20; i++)
 	{
-		if (MagUnderCalCurve == 1)
+		if (MagBetweenCurves(pPHCI[0],CIarray[i].iZ))
 		{
-			if (mag > GetCalZ_on_F_iZ(CIarray[i].iZ,freq))
+			if (PhBetweenCurves(pPHCI[0],CIarray[i].iZ))
 			{
-				if ( ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex-1))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex-1))) || ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex+1))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex+1))) || ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex-1))) || ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex+1))) || ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex-1))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex))) || ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex+1))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex))))
-				{
-					pPHCI[1] = CIarray[i].iZ;
-					break;
-				}
-			}
-		}
-		else
-		{
-			if (mag < GetCalZ_on_F_iZ(CIarray[i].iZ,freq))
-			{
-				if ( ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex-1))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex-1))) || ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex+1))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex+1))) || ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex-1))) || ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex+1))) || ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex-1))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex))) || ((GetParIndex(CalData[CIarray[i].iZ].Rp) == (LowCurveParIndex+1))  && (GetCapIndex(CalData[CIarray[i].iZ].C) == (LowCurveCapIndex))))
-				{
-					pPHCI[1] = CIarray[i].iZ;
-					break;
-				}
+				pPHCI[1] = CIarray[i].iZ;
+				break;
 			}
 		}
 	}
-	if (i == 10)
-		{
-			pPHCI[1] = CIarray[1].iZ;
-		}
+	if (i == 20)
+	{
+		pPHCI[1] = CIarray[1].iZ;
+	}
 	if (debug_mode==1)
+	{
+		if (i!=20)
 		{
-			if (i!=10)
-				{
-					printf("\nPhase CI might be correct :)");
-				}
+			printf("\nPhase CI might be correct :)");
 		}
+	}
 	
-	// Ќайдем кривые, расположенные по разные стороны в пространстве модулей
+	realloc(CIarray, sizeof(struct IndZwith_float_Z_str)*10);
 	pMagCI[0] = CIarray[0].iZ;//ѕусть первый индекс будет CIarray[0].iZ
 	if (GetCalZ_on_F_iZ (CIarray[0].iZ, freq) < mag)
+	{
+		for (i = 1; i < 10; i++)
+		{
+			if (GetCalZ_on_F_iZ (CIarray[i].iZ, freq) > mag)
+			{
+				pMagCI[1] = CIarray[i].iZ;
+				break;
+			}
+		}
+		if (i == 10)
+		{
+			pMagCI[1] = CIarray[1].iZ;
+		}
+		}
+		else
 		{
 			for (i = 1; i < 10; i++)
 			{
-				if (GetCalZ_on_F_iZ (CIarray[i].iZ, freq) > mag)
-					{
-						pMagCI[1] = CIarray[i].iZ;
-						break;
-					}
+				if (GetCalZ_on_F_iZ (CIarray[i].iZ, freq) < mag)
+				{
+					pMagCI[1] = CIarray[i].iZ;
+					break;
+				}
 			}
 			if (i == 10)
-				{
-					pMagCI[1] = CIarray[1].iZ;
-				}
+			{
+				pMagCI[1] = CIarray[1].iZ;
+			}
+		}
+	if (debug_mode==1)
+	{
+		if (i!=10)
+		{
+			printf("\nMag CI might be correct :)");
 		}
 		else
-			{
-				for (i = 1; i < 10; i++)
-				{
-					if (GetCalZ_on_F_iZ (CIarray[i].iZ, freq) < mag)
-						{
-							pMagCI[1] = CIarray[i].iZ;
-							break;
-						}
-				}
-				if (i == 10)
-					{
-						pMagCI[1] = CIarray[1].iZ;
-					}
-			}
-	if (debug_mode==1)
 		{
-			if (i!=10)
-				{
-					printf("\nMag CI might be correct :)");
-				}
-				else
-					{
-						printf("\nMag CI calibrating curves are located at one side of measured magnitude of impedance.");
-					}
+			printf("\nMag CI calibrating curves are located at one side of measured magnitude of impedance.");
 		}
+	}
 	if (debug_mode==1)
-		{
-			printf("\npMagSortedCurvesDeviation:\n%-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f" , CIarray[0].Z, CIarray[1].Z, CIarray[2].Z, CIarray[3].Z, CIarray[4].Z, CIarray[5].Z, CIarray[6].Z, CIarray[7].Z, CIarray[8].Z, CIarray[9].Z);
-			printf("\npMagSortedCurvesIndexes:\n%-6u %-6u %-6u %-6u %-6u %-6u %-6u %-6u %-6u %-6u", CIarray[0].iZ, CIarray[1].iZ, CIarray[2].iZ, CIarray[3].iZ, CIarray[4].iZ, CIarray[5].iZ, CIarray[6].iZ, CIarray[7].iZ, CIarray[8].iZ, CIarray[9].iZ);
-		}
+	{
+		printf("\npMagSortedCurvesDeviation:\n%-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f %-6.3f" , CIarray[0].Z, CIarray[1].Z, CIarray[2].Z, CIarray[3].Z, CIarray[4].Z, CIarray[5].Z, CIarray[6].Z, CIarray[7].Z, CIarray[8].Z, CIarray[9].Z);
+		printf("\npMagSortedCurvesIndexes:\n%-6u %-6u %-6u %-6u %-6u %-6u %-6u %-6u %-6u %-6u", CIarray[0].iZ, CIarray[1].iZ, CIarray[2].iZ, CIarray[3].iZ, CIarray[4].iZ, CIarray[5].iZ, CIarray[6].iZ, CIarray[7].iZ, CIarray[8].iZ, CIarray[9].iZ);
+	}
 	
 	if (CorrectIndexesBrute == 1)
+	{
+		pPHCI[0] = CIarray[FirstCICounter].iZ;
+		pPHCI[1] = CIarray[SecondCICounter].iZ;
+		
+		FirstCICounter++;
+		if (FirstCICounter == 10)
 		{
-			pPHCI[0] = CIarray[FirstCICounter].iZ;
-			pPHCI[1] = CIarray[SecondCICounter].iZ;
-			
-			FirstCICounter++;
-			if (FirstCICounter == 10)
+			FirstCICounter = 0;
+			SecondCICounter++;
+			if (SecondCICounter == 10)
 			{
+				SecondCICounter = 0;
 				FirstCICounter = 0;
-				SecondCICounter++;
-				if (SecondCICounter == 10)
-				{
-					SecondCICounter = 0;
-					FirstCICounter = 0;
-				}
 			}
 		}
+	}
 	free(CIarray);
 }
 
@@ -1401,6 +1373,57 @@ uint8_t GetParIndex(uint16_t par)
 			break;
 	}
 	return i;
+}
+
+uint8_t MagBetweenCurves(uint16_t iZ1, uint16_t iZ2)
+{
+	if (GetCalZ_on_F_iZ(iZ1, freq) > mag)
+	{
+		if (GetCalZ_on_F_iZ(iZ2, freq) < mag)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	else
+	{
+		if (GetCalZ_on_F_iZ(iZ2, freq) > mag)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+}
+uint8_t PhBetweenCurves(uint16_t iZ1, uint16_t iZ2)
+{
+	if (GetCalPH_on_F_iZ(iZ1, freq) > ph)
+	{
+		if (GetCalPH_on_F_iZ(iZ2, freq) < ph)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	else
+	{
+		if (GetCalPH_on_F_iZ(iZ2, freq) > ph)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
 }
 
 // END OF FILE

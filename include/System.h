@@ -141,3 +141,6 @@ void SaveCalData( struct CalData_struct* CalDataClibr, uint8_t stop_bit );
 
 uint8_t GetCapIndex(uint16_t cap);
 uint8_t GetParIndex(uint16_t par);
+
+uint8_t MagBetweenCurves(uint16_t iZ1, uint16_t iZ2);
+uint8_t PhBetweenCurves(uint16_t iZ1, uint16_t iZ2);
