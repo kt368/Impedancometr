@@ -7,7 +7,6 @@
 #include "pt.h"														 /* PROTOTHREADS sources */
 #include "lpc17xx_libcfg_default.h"
 #include "math.h"
-#include "lpc17xx_i2s.h"
 #include <stdio.h>
 #include "lpc17xx_clkpwr.h"
 extern void test(void);

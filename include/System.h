@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include "AD9833.h"
 #include <string.h>
-#include "lpc17xx_i2s.h"
+#include "AD7793.h"				// AD7793 definitions.
 
 #define LOW									0
 #define HIGH								1
@@ -77,9 +77,9 @@ void Init_GPIO_Pins (void);
 void Init (void);
 void Init_ADC (void);
 void test (void);
+void blink (void);
 void led_on (void);
 void led_off (void);
-void V12SW_ON2(void);
 void CalibrateMagPhaseCalcTheoretic(mag_ph_calc_calibr_struct_t *);
 void logspace(uint32_t base, uint8_t n_bins, uint32_t min, uint32_t max, uint32_t array[]);
 uint16_t CalcCalibrDataSize(void);
@@ -110,13 +110,8 @@ uint32_t GetCalPH_on_iZ_iF (uint16_t iZ, uint8_t iF);
 float GetCalZ_on_F_iZ (uint16_t iZ, uint16_t freq);
 float GetCalPH_on_F_iZ (uint16_t iZ, uint16_t freq);
 
-//float GetRealZ_on_F_iZ_for_Z(uint16_t freq, uint16_t iZ, uint16_t Z);
 float GetRealZ_on_F_iZ1_iZ2_for_Z(uint16_t freq, uint16_t iZ1, uint16_t iZ2, uint16_t Z);
 float GetRealPH_on_F_iZ1_iZ2_for_PH(uint16_t freq, uint16_t iZ1, uint16_t iZ2, uint16_t PH);
-//float GetRealZ_on_iF_iZ_for_Z (uint8_t freq_index, uint16_t Z, uint16_t iZ);
-
-//float GetRealPH_on_F_iZ_for_Z(uint16_t freq, uint16_t iZ, uint16_t PH);
-//float GetRealPH_on_iF_iZ_for_PH (uint8_t freq_index, uint16_t PH, uint16_t iZ);
 
 void wait (uint32_t t);
 struct PrepareStructForZcal_str GetPrepareStructForZcal (void);
@@ -135,7 +130,7 @@ extern int __disable_irq(void);
 PT_THREAD(Starting(struct pt *pt));
 
 uint16_t ADC_int_RUN(LPC_ADC_TypeDef *ADCx, ADC_CHANNEL_SELECTION channel, uint8_t n_Samples, uint8_t overs_bits);
-uint32_t ADC_RUN(uint8_t n_Samples);
+uint32_t ADC_RUN(void);
 
 void SaveCalData( struct CalData_struct* CalDataClibr, uint8_t stop_bit );
 

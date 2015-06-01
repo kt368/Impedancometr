@@ -451,6 +451,20 @@ FlagStatus SPI_CheckStatus (uint32_t inputSPIStatus,  uint8_t SPIStatus)
     return ((inputSPIStatus & SPIStatus) ? SET : RESET);
 }
 
+void SpiInitForAD7793(LPC_SPI_TypeDef *SPIx)
+{
+	SPI_CFG_Type SPI_GonfigStruct;
+	
+	SPI_GonfigStruct.ClockRate = 1000000;
+	SPI_GonfigStruct.CPHA = SPI_CPHA_SECOND;
+	SPI_GonfigStruct.CPOL = SPI_CPOL_LO;
+	SPI_GonfigStruct.Databit = SPI_DATABIT_8;
+	SPI_GonfigStruct.DataOrder = SPI_DATA_MSB_FIRST;
+	SPI_GonfigStruct.Mode = SPI_MASTER_MODE;
+	
+	SPI_Init(SPIx, &SPI_GonfigStruct);
+}
+
 
 /**
  * @}

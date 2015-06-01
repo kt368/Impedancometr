@@ -274,7 +274,7 @@ typedef enum {
  */
 typedef struct {
     void *tx_data;              /**< Pointer to transmit data */
-    void *rx_data;              /**< Pointer to transmit data */
+    void *rx_data;              /**< Pointer to recieve data */
     uint32_t length;            /**< Length of transfer data */
     uint32_t counter;           /**< Data counter index */
     uint32_t status;            /**< Current status of SPI activity */
@@ -295,6 +295,7 @@ void SPI_Init(LPC_SPI_TypeDef *SPIx, SPI_CFG_Type *SPI_ConfigStruct);
 void SPI_DeInit(LPC_SPI_TypeDef *SPIx);
 void SPI_SetClock (LPC_SPI_TypeDef *SPIx, uint32_t target_clock);
 void SPI_ConfigStructInit(SPI_CFG_Type *SPI_InitStruct);
+void SpiInitForAD7793(LPC_SPI_TypeDef *SPIx);
 
 /* SPI transfer functions ------------*/
 void SPI_SendData(LPC_SPI_TypeDef *SPIx, uint16_t Data);

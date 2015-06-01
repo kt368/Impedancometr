@@ -296,14 +296,14 @@
 #define SCS_Val               0x30
 #define CLKSRCSEL_Val         0x00000001
 #define PLL0_SETUP            1
-#define PLL0CFG_Val           0x0011007C	//M=144, N=25
+#define PLL0CFG_Val           0x00030018	//M=144, N=25
 #define PLL1_SETUP            0
 #define PLL1CFG_Val           0x00000023
-#define CCLKCFG_Val           0x00000003
+#define CCLKCFG_Val           0x00000002
 #define USBCLKCFG_Val         0x00000005
-#define PCLKSEL0_Val          0x01000000
+#define PCLKSEL0_Val          0x01010000
 #define PCLKSEL1_Val          0x00800000
-#define PCONP_Val             0x0800930E
+#define PCONP_Val             0x0000810E
 #define CLKOUTCFG_Val         0x00000000
 
 

@@ -47,7 +47,7 @@ PT_THREAD(Power_mgmt(struct pt *pt))
 LOW_HIGH_TYPE ADC_bat(void)
 {
 	uint32_t Vbat_ADC;
-	Vbat_ADC = ADC_RUN(LPC_ADC, ADC_CHANNEL, 5, 0);
+	Vbat_ADC = ADC_int_RUN(LPC_ADC, ADC_CHANNEL, 5, 0);
 	Vbat_ADC = ( Vbat_ADC << 15 ) / 621;
 	//Vbat_ADC now in Q15 format
 	if (Vbat_ADC < battarey_low)

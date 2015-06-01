@@ -10,8 +10,8 @@
 #include "GPIO_signals.h"
 #include "flash_nvol.h"
 #include "System.h"
-#include "lpc17xx_i2s.h"
 #include "lpc17xx_clkpwr.h"
+#include "AD7793.h"				// AD7793 definitions.
 
 #define _ADC_CHANNEL        ADC_CHANNEL_3
 #define LOW									0
@@ -20,10 +20,7 @@
 void Init_GPIO_Pins (void);
 void Init (void);
 void Init_ADC (void);
-void Starting_init (void);
+void Init_AD7793(void);
 extern void SER_Init(uint32_t baudrate);
 
 PT_THREAD(Starting(struct pt *pt));
-
-I2S_CFG_Type ConfigStruct;
-I2S_MODEConf_Type I2S_MODEConf;

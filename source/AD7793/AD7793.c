@@ -45,6 +45,8 @@
 /******************************************************************************/
 #include "AD7793.h"				// AD7793 definitions.
 #include "Communication.h"		// Communication definitions.
+#include <stdio.h>				// For printf
+extern void blink(void);
 
 /***************************************************************************//**
  * @brief Initializes the AD7793 and checks if the device is present.
@@ -56,13 +58,16 @@
 unsigned char AD7793_Init(void)
 { 
 	unsigned char status = 0x1;
-    
-    SPI_Init(0, 1000000, 1, 1);
+
+	SpiInitForAD7793(LPC_SPI);
+	
+	blink();
+	AD7793_Reset();
     if((AD7793_GetRegisterValue(AD7793_REG_ID, 1, 1) & 0x0F) != AD7793_ID)
 	{
 		status = 0x0;
 	}
-    
+	
 	return(status);
 }
 
@@ -74,8 +79,7 @@ unsigned char AD7793_Init(void)
 void AD7793_Reset(void)
 {
 	unsigned char dataToSend[5] = {0x03, 0xff, 0xff, 0xff, 0xff};
-	
-    ADI_PART_CS_LOW;	    
+	ADI_PART_CS_LOW;	    
 	SPI_Write(dataToSend,4);
 	ADI_PART_CS_HIGH;	
 }
@@ -93,7 +97,7 @@ unsigned long AD7793_GetRegisterValue(unsigned char regAddress,
 {
 	unsigned char data[5]      = {0x00, 0x00, 0x00, 0x00, 0x00};
 	unsigned long receivedData = 0x00;
-    unsigned char i            = 0x00; 
+  unsigned char i            = 0x00; 
     
 	data[0] = 0x01 * modifyCS;
 	data[1] = AD7793_COMM_READ |  AD7793_COMM_ADDR(regAddress); 
@@ -121,7 +125,7 @@ void AD7793_SetRegisterValue(unsigned char regAddress,
 {
 	unsigned char data[5]      = {0x00, 0x00, 0x00, 0x00, 0x00};	
 	unsigned char* dataPointer = (unsigned char*)&regValue;
-    unsigned char bytesNr      = size + 1;
+  unsigned char bytesNr      = size + 1;
     
     data[0] = 0x01 * modifyCS;
     data[1] = AD7793_COMM_WRITE |  AD7793_COMM_ADDR(regAddress);
@@ -167,23 +171,148 @@ void AD7793_SetMode(unsigned long mode)
             command,
             2, 
             1); // CS is modified by SPI read/write functions.
+	
 }
 /***************************************************************************//**
- * @brief Selects the channel of AD7793.
+ * @brief Sets the clock source of AD7793.
  *
- * @param  channel - ADC channel selection.
+ * @param clk - clock source select field
  *
  * @return  None.    
 *******************************************************************************/
-void AD7793_SetChannel(unsigned long channel)
+void AD7793_SetClk(unsigned long clk)
+{
+    unsigned long command;
+    
+    command = AD7793_GetRegisterValue(AD7793_REG_MODE,
+                                      2,
+                                      1); // CS is modified by SPI read/write functions.
+    command &= ~AD7793_MODE_CLKSRC(0xFF);
+    command |= AD7793_MODE_CLKSRC(clk);
+    AD7793_SetRegisterValue(
+            AD7793_REG_MODE,
+            command,
+            2, 
+            1); // CS is modified by SPI read/write functions.
+	
+}
+/***************************************************************************//**
+ * @brief Sets the apdate rate of AD7793.
+ *
+ * @param rate - Filter Update Rate Select field
+ *
+ * @return  None.    
+*******************************************************************************/
+void AD7793_SetRate(unsigned long rate)
+{
+    unsigned long command;
+    
+    command = AD7793_GetRegisterValue(AD7793_REG_MODE,
+                                      2,
+                                      1); // CS is modified by SPI read/write functions.
+    command &= ~AD7793_MODE_RATE(0xFF);
+    command |= AD7793_MODE_RATE(rate);
+    AD7793_SetRegisterValue(
+            AD7793_REG_MODE,
+            command,
+            2, 
+            1); // CS is modified by SPI read/write functions.
+	
+}
+/***************************************************************************//**
+ * @brief Configuring Bias Voltage Generator.
+ *
+ * @param  vbias - bias field of Configuration Register
+ *
+ * @return  None.    
+*******************************************************************************/
+void AD7793_SetBias(unsigned long vbias)
 {
     unsigned long command;
     
     command = AD7793_GetRegisterValue(AD7793_REG_CONF,
                                       2,
                                       1); // CS is modified by SPI read/write functions.
-    command &= ~AD7793_CONF_CHAN(0xFF);
-    command |= AD7793_CONF_CHAN(channel);
+    command &= ~AD7793_CONF_VBIAS(0xFF);
+    command |= AD7793_CONF_VBIAS(vbias);
+    AD7793_SetRegisterValue(
+            AD7793_REG_CONF,
+            command,
+            2,
+            1); // CS is modified by SPI read/write functions.
+}
+
+/***************************************************************************//**
+ * @brief Configuring Burnout circuit.
+ *
+ * @param  bo - Burnout Current Enable Bit
+ *
+ * @return  None.    
+*******************************************************************************/
+void AD7793_SetBO(unsigned long bo)
+{
+    unsigned long command;
+    
+    command = AD7793_GetRegisterValue(AD7793_REG_CONF,
+                                      2,
+                                      1); // CS is modified by SPI read/write functions.
+		command &= ~AD7793_CONF_BO_EN;
+	if (bo == 1)
+	{
+		command |= AD7793_CONF_BO_EN;
+	}
+    AD7793_SetRegisterValue(
+            AD7793_REG_CONF,
+            command,
+            2,
+            1); // CS is modified by SPI read/write functions.
+}
+
+/***************************************************************************//**
+ * @brief Configuring Unipolar/bipolar mode.
+ *
+ * @param  UnB - Unipolar/bipolar mode Bit
+ *
+ * @return  None.    
+*******************************************************************************/
+void AD7793_SetUnB(unsigned long UnB)
+{
+    unsigned long command;
+    
+    command = AD7793_GetRegisterValue(AD7793_REG_CONF,
+                                      2,
+                                      1); // CS is modified by SPI read/write functions.
+		command &= ~AD7793_CONF_UNIPOLAR;
+	if (UnB == 1)
+	{
+		command |= AD7793_CONF_UNIPOLAR;
+	}
+    AD7793_SetRegisterValue(
+            AD7793_REG_CONF,
+            command,
+            2,
+            1); // CS is modified by SPI read/write functions.
+}
+
+/***************************************************************************//**
+ * @brief Configuring Boost bias mode.
+ *
+ * @param  Boost - Boost bias mode Bit
+ *
+ * @return  None.    
+*******************************************************************************/
+void AD7793_SetBoost(unsigned long Boost)
+{
+    unsigned long command;
+    
+    command = AD7793_GetRegisterValue(AD7793_REG_CONF,
+                                      2,
+                                      1); // CS is modified by SPI read/write functions.
+		command &= ~AD7793_CONF_BOOST;
+	if (Boost == 1)
+	{
+		command |= AD7793_CONF_BOOST;
+	}
     AD7793_SetRegisterValue(
             AD7793_REG_CONF,
             command,
@@ -213,6 +342,7 @@ void AD7793_SetGain(unsigned long gain)
             2,
             1); // CS is modified by SPI read/write functions.
 }
+
 /***************************************************************************//**
  * @brief Sets the reference source for the ADC.
  *
@@ -238,6 +368,57 @@ void AD7793_SetIntReference(unsigned char type)
 }
 
 /***************************************************************************//**
+ * @brief Configuring input buffer.
+ *
+ * @param  buffer - enable|disable input buffer bit
+ *
+ * @return  None.    
+*******************************************************************************/
+void AD7793_SetBuff(unsigned long buff)
+{
+    unsigned long command;
+    
+    command = AD7793_GetRegisterValue(AD7793_REG_CONF,
+                                      2,
+                                      1); // CS is modified by SPI read/write functions.
+		command &= ~AD7793_CONF_BUF;
+	if (buff == 1)
+	{
+		command |= AD7793_CONF_BUF;
+	}
+    AD7793_SetRegisterValue(
+            AD7793_REG_CONF,
+            command,
+            2,
+            1); // CS is modified by SPI read/write functions.
+}
+
+/***************************************************************************//**
+ * @brief Selects the channel of AD7793.
+ *
+ * @param  channel - ADC channel selection.
+ *
+ * @return  None.    
+*******************************************************************************/
+void AD7793_SetChannel(unsigned long channel)
+{
+    unsigned long command;
+    
+    command = AD7793_GetRegisterValue(AD7793_REG_CONF,
+                                      2,
+                                      1); // CS is modified by SPI read/write functions.
+    command &= ~AD7793_CONF_CHAN(0xFF);
+    command |= AD7793_CONF_CHAN(channel);
+    AD7793_SetRegisterValue(
+            AD7793_REG_CONF,
+            command,
+            2,
+            1); // CS is modified by SPI read/write functions.
+}
+
+
+
+/***************************************************************************//**
  * @brief Performs the given calibration to the specified channel.
  *
  * @param mode - Calibration type.
@@ -249,15 +430,19 @@ void AD7793_Calibrate(unsigned char mode, unsigned char channel)
 {
     unsigned short oldRegValue = 0x0;
     unsigned short newRegValue = 0x0;
+		volatile unsigned long command = 0x0;
     
     AD7793_SetChannel(channel);
-    oldRegValue &= AD7793_GetRegisterValue(AD7793_REG_MODE, 2, 1); // CS is modified by SPI read/write functions.
+    oldRegValue = AD7793_GetRegisterValue(AD7793_REG_MODE, 2, 1); // CS is modified by SPI read/write functions.
     oldRegValue &= ~AD7793_MODE_SEL(0x7);
     newRegValue = oldRegValue | AD7793_MODE_SEL(mode);
     ADI_PART_CS_LOW; 
     AD7793_SetRegisterValue(AD7793_REG_MODE, newRegValue, 2, 0); // CS is not modified by SPI read/write functions.
     AD7793_WaitRdyGoLow();
     ADI_PART_CS_HIGH;
+	    command = AD7793_GetRegisterValue(AD7793_REG_MODE,
+                                      2,
+                                      1); // CS is modified by SPI read/write functions.
     
 }
 
@@ -271,7 +456,12 @@ unsigned long AD7793_SingleConversion(void)
     unsigned long command = 0x0;
     unsigned long regData = 0x0;
     
-    command  = AD7793_MODE_SEL(AD7793_MODE_SINGLE);
+		command = AD7793_GetRegisterValue(AD7793_REG_MODE,
+                                      2,
+                                      1); // CS is modified by SPI read/write functions.
+    command &= ~AD7793_MODE_SEL(0xF);
+    command |= AD7793_MODE_SEL(AD7793_MODE_SINGLE);
+	
     ADI_PART_CS_LOW;
     AD7793_SetRegisterValue(AD7793_REG_MODE, 
                             command,
@@ -295,7 +485,12 @@ unsigned long AD7793_ContinuousReadAvg(unsigned char sampleNumber)
     unsigned long command        = 0x0;
     unsigned char count          = 0x0;
     
-    command = AD7793_MODE_SEL(AD7793_MODE_CONT);
+    command = AD7793_GetRegisterValue(AD7793_REG_MODE,
+                                      2,
+                                      1); // CS is modified by SPI read/write functions.
+    command &= ~AD7793_MODE_SEL(0xF);
+    command |= AD7793_MODE_SEL(AD7793_MODE_CONT);
+	
     ADI_PART_CS_LOW;
     AD7793_SetRegisterValue(AD7793_REG_MODE,
                             command, 

@@ -14,5 +14,3 @@
 #define SCRN_SEL_YES				GPIO_ClearValue (2, (1<<8) )
 #define Vbat_supply_OFF			GPIO_ClearValue (1, (1<<4) )
 #define Vbat_supply_ON			GPIO_SetValue (1, (1<<4) )
-
-extern void V12SW_ON2(void);

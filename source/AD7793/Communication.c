@@ -44,6 +44,7 @@
 /* Include Files                                                              */
 /******************************************************************************/
 #include "Communication.h"
+extern unsigned char AD7793_Init(void);
 
 /***************************************************************************//**
  * @brief Initializes the SPI communication peripheral.
@@ -64,15 +65,15 @@
  *
  * @return 0 - Initialization failed, 1 - Initialization succeeded.
 *******************************************************************************/
-unsigned char SPI_Init(unsigned char lsbFirst,
-                       unsigned long clockFreq,
-                       unsigned char clockPol,
-                       unsigned char clockPha)
-{
-	// Add your code here.
-	
-    return(1);
-}
+//unsigned char SPI_Init(unsigned char lsbFirst,
+//                       unsigned long clockFreq,
+//                       unsigned char clockPol,
+//                       unsigned char clockPha)
+//{
+//	// Add your code here.
+//	
+//    return(1);
+//}
 
 /***************************************************************************//**
  * @brief Writes data to SPI.
@@ -87,8 +88,24 @@ unsigned char SPI_Init(unsigned char lsbFirst,
 unsigned char SPI_Write(unsigned char* data,
                         unsigned char bytesNumber)
 {
-	// Add your code here.
+	uint8_t i;
+	SpiInitForAD7793(LPC_SPI);
+	
+	if (data[0] == 1)
+	{
+		GPIO_ClearValue(1, 1<<29);
+	}
 
+	for (i=1;i<=bytesNumber;i++)
+	{
+		SPI_SendData(LPC_SPI,data[i]);
+		while( SPI_CheckStatus( SPI_GetStatus(LPC_SPI), SPI_STAT_SPIF) == RESET );
+	}
+	
+	if (data[0] == 1)
+	{
+		GPIO_SetValue(1, 1<<29);
+	}
 	return(bytesNumber);
 }
 
@@ -104,10 +121,41 @@ unsigned char SPI_Write(unsigned char* data,
  *
  * @return Number of written bytes.
 *******************************************************************************/
+
+// ÏÐÎÂÅÐÈÒÜ ÏÐÈÌÅÍÅÍÈÅ ÔÓÍÊÖÈÈ SPI_ReadWrite
 unsigned char SPI_Read(unsigned char* data,
                        unsigned char bytesNumber)
 {
-	// Add your code here.
+	
+	uint8_t chipSelect    = data[0];
+	uint8_t writeData[4]  = {0, 0, 0, 0};
+	uint8_t readData[4]	= {0, 0, 0, 0};
+	uint8_t byte          = 0;
+  SpiInitForAD7793(LPC_SPI);
+     for(byte = 0;byte < bytesNumber;byte ++)
+    {
+        writeData[byte] = data[byte + 1];
+        data[byte + 1] = 0;
+    }
+    if(chipSelect == 1)
+    {
+        ADI_PART_CS_LOW;
+    }
 
+    for(byte = 0;byte < bytesNumber;byte ++)
+    {
+			SPI_SendData(LPC_SPI, writeData[byte]);
+			while( SPI_CheckStatus( SPI_GetStatus(LPC_SPI), SPI_STAT_SPIF) == RESET );
+			readData[byte] = SPI_ReceiveData(LPC_SPI);
+    }
+    if(chipSelect == 1)
+    {
+        ADI_PART_CS_HIGH;
+    }
+	for(byte = 0;byte < bytesNumber;byte ++)
+    {
+        data[byte] = readData[byte];
+    }
+		
 	return(bytesNumber);
 }

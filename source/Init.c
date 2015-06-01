@@ -21,78 +21,32 @@ PINSEL_CFG_Type PinCfg;
 		//SYSTICK_IntCmd(ENABLE);				//Enable SysTick counter interrupts
 		V12SW_OFF;
 		Init_GPIO_Pins();
-		Init_ADC();
-		test();
-		V12SW_ON2();
-		test();
-		
-		I2S_Init(LPC_I2S);
-		
-		I2S_FreqConfig(LPC_I2S, fs, I2S_RX_MODE);
-		I2S_FreqConfig(LPC_I2S, fs, I2S_TX_MODE);
-		
-		I2S_MODEConf.clksel = I2S_CLKSEL_FRDCLK;
-		I2S_MODEConf.fpin = I2S_4PIN_DISABLE;
-		I2S_MODEConf.mcena = I2S_MCLK_DISABLE;
-		I2S_ModeConfig(LPC_I2S, &I2S_MODEConf, I2S_TX_MODE);
-		
-		I2S_MODEConf.clksel = I2S_CLKSEL_FRDCLK;
-		I2S_MODEConf.fpin = I2S_4PIN_ENABLE;
-		I2S_MODEConf.mcena = I2S_MCLK_DISABLE;
-		I2S_ModeConfig(LPC_I2S, &I2S_MODEConf, I2S_RX_MODE);
-		
-		ConfigStruct.wordwidth = I2S_WORDWIDTH_32;
-		ConfigStruct.mono = I2S_STEREO;
-		ConfigStruct.stop = I2S_STOP_DISABLE;
-		ConfigStruct.reset = I2S_RESET_DISABLE;
-		ConfigStruct.ws_sel = I2S_MASTER_MODE;
-		ConfigStruct.mute = I2S_MUTE_DISABLE;
-		I2S_Config(LPC_I2S, I2S_RX_MODE, &ConfigStruct);
-		
-		ConfigStruct.wordwidth = I2S_WORDWIDTH_32;
-		ConfigStruct.mono = I2S_STEREO;
-		ConfigStruct.stop = I2S_STOP_DISABLE;
-		ConfigStruct.reset = I2S_RESET_DISABLE;
-		ConfigStruct.ws_sel = I2S_MASTER_MODE;
-		ConfigStruct.mute = I2S_MUTE_DISABLE;
-		I2S_Config(LPC_I2S, I2S_TX_MODE, &ConfigStruct);
-		
-		I2S_IRQConfig(LPC_I2S, I2S_RX_MODE, 8);
-
-		I2S_FreqConfig(LPC_I2S, fs, I2S_RX_MODE);
-		I2S_FreqConfig(LPC_I2S, fs, I2S_TX_MODE);
-
-		
+		//Init_ADC();
+		V12SW_ON;
 		SER_Init(115200);
+		Init_AD7793();
+		test();
+		
+		
 		BatCharge_OFF;								
-
-	//Switch OFF battarey charging
+		//Switch OFF battarey charging
+		
 		DDS_FSYNC_HIGH;							
-
 		//Prevent loading SPI data in DDS AD9833
+		
 		Vbus_sys_SW_OFF;							
-
-	//Disconnect USB Vbus from V6 system power bus
+		//Disconnect USB Vbus from V6 system power bus
+		
 		VLED_SW_LOW;								
-
 		//Low LCD LED brightless
+		
 		SCRN_SEL_NO;								
-
 		//Not transfer data to display (through SPI)
+		
 		Vbat_supply_ON;								
-
 	//receive power from battarey through main switch
 
-		LPC_I2S -> I2SDAI |= 0x18;
-		LPC_I2S -> I2SDAO |= 0x18;
-		LPC_I2S -> I2SDAI &= ~0x18;
-		LPC_I2S -> I2SDAO &= ~0x18;
-		
-		NVIC_SetPriority(I2S_IRQn,0);
-		NVIC_SetPriority(UART0_IRQn,30);
-		NVIC_ClearPendingIRQ(I2S_IRQn);
-		I2S_IRQCmd(LPC_I2S, I2S_RX_MODE, ENABLE);
-		NVIC_EnableIRQ(I2S_IRQn);
+		//NVIC_SetPriority(UART0_IRQn,0);
 		
 	}
 
@@ -103,6 +57,33 @@ PINSEL_CFG_Type PinCfg;
     */
     ADC_Init(LPC_ADC, 200000);
     ADC_ChannelCmd(LPC_ADC,2,ENABLE);
+	}
+	void Init_AD7793(void)
+	{
+		uint8_t AD7793_Init_result;
+		AD7793_Init_result = AD7793_Init();
+		if (AD7793_Init_result == 0)
+		{
+			printf("\n AD7793 Init Error\n>");
+		}
+		blink();
+
+		AD7793_SetMode(AD7793_MODE_IDLE);
+		AD7793_SetClk(AD7793_CLK_INT);
+		AD7793_SetRate(0xF);
+		AD7793_SetBias(0x0);
+		AD7793_SetBO(0);
+		AD7793_SetUnB(1);
+		AD7793_SetBoost(0);
+		AD7793_SetGain(AD7793_GAIN_1);
+		AD7793_SetIntReference(AD7793_REFSEL_EXT);
+		AD7793_SetBuff(0);
+		AD7793_SetChannel(AD7793_CH_AIN1P_AIN1M);
+		AD7793_Calibrate(AD7793_MODE_CAL_INT_ZERO, AD7793_CH_AIN1P_AIN1M);
+		AD7793_Calibrate(AD7793_MODE_CAL_INT_FULL, AD7793_CH_AIN1P_AIN1M);
+		
+		blink();
+		
 	}
 	
 	void Init_GPIO_Pins (void)
@@ -128,6 +109,7 @@ PINSEL_CFG_Type PinCfg;
 	PinCfg.Pinnum = PINSEL_PIN_1;
 	PinCfg.Portnum = PINSEL_PORT_0;
 	PINSEL_ConfigPin(&PinCfg);
+	GPIO_SetValue(0, 1<<1);			//Set P0.1 high
 	GPIO_SetDir(0, (1<<1), 1); //Set P0.1 as output
 	
 	/*
@@ -151,40 +133,7 @@ PINSEL_CFG_Type PinCfg;
 	PinCfg.Portnum = PINSEL_PORT_0;
 	PINSEL_ConfigPin(&PinCfg);
 	GPIO_SetDir(0, (1<<3), 0); //Set P0.3 as input
-	
-	/*
-	* Init I2SRX_SDA(DATA) signal on P0.6
-	*/
-	PinCfg.Funcnum = PINSEL_FUNC_1;
-	PinCfg.OpenDrain = PINSEL_PINMODE_NORMAL;
-	PinCfg.Pinmode = PINSEL_PINMODE_TRISTATE;
-	PinCfg.Pinnum = PINSEL_PIN_6;
-	PinCfg.Portnum = PINSEL_PORT_0;
-	PINSEL_ConfigPin(&PinCfg);
-	GPIO_SetDir(0, (1<<6), 0); //Set P0.6 as input
-	
-	/*
-	* Init I2STX_CLK(BCK) signal on P0.7
-	*/
-	PinCfg.Funcnum = PINSEL_FUNC_1;
-	PinCfg.OpenDrain = PINSEL_PINMODE_NORMAL;
-	PinCfg.Pinmode = PINSEL_PINMODE_TRISTATE;
-	PinCfg.Pinnum = PINSEL_PIN_7;
-	PinCfg.Portnum = PINSEL_PORT_0;
-	PINSEL_ConfigPin(&PinCfg);
-	GPIO_SetDir(0, (1<<7), 1); //Set P0.7 as output
-	
-	/*
-	* Init I2STX_WS(LRCK) signal on P0.8
-	*/
-	PinCfg.Funcnum = PINSEL_FUNC_1;
-	PinCfg.OpenDrain = PINSEL_PINMODE_NORMAL;
-	PinCfg.Pinmode = PINSEL_PINMODE_TRISTATE;
-	PinCfg.Pinnum = PINSEL_PIN_8;
-	PinCfg.Portnum = PINSEL_PORT_0;
-	PINSEL_ConfigPin(&PinCfg);
-	GPIO_SetDir(0, (1<<8), 1); //Set P0.8 as output
-	
+		
 	/*
 	* Init D/C signal on P0.9
 	*/
@@ -206,17 +155,6 @@ PINSEL_CFG_Type PinCfg;
 	PinCfg.Portnum = PINSEL_PORT_0;
 	PINSEL_ConfigPin(&PinCfg);
 	GPIO_SetDir(0, (1<<10), 1); //Set P0.10 as output
-
-	/*
-	* Init DATA signal on P0.11
-	*/
-	PinCfg.Funcnum = PINSEL_FUNC_0;
-	PinCfg.OpenDrain = PINSEL_PINMODE_NORMAL;
-	PinCfg.Pinmode = PINSEL_PINMODE_TRISTATE;
-	PinCfg.Pinnum = PINSEL_PIN_11;
-	PinCfg.Portnum = PINSEL_PORT_0;
-	PINSEL_ConfigPin(&PinCfg);
-	GPIO_SetDir(0, (1<<11), 0); //Set P0.11 as input
 
 	/*
 	* Init SCK signal on P0.15
@@ -252,15 +190,15 @@ PINSEL_CFG_Type PinCfg;
 	GPIO_SetDir(0, (1<<18), 1); //Set P0.18 as output
 	
 		/*
-	* Init ADC_corr signal on P0.25
+	* Init V_lcd_led_SW signal on P0.25
 	*/
-	PinCfg.Funcnum = PINSEL_FUNC_1;
+	PinCfg.Funcnum = PINSEL_FUNC_0;
 	PinCfg.OpenDrain = PINSEL_PINMODE_NORMAL;
 	PinCfg.Pinmode = PINSEL_PINMODE_TRISTATE;
 	PinCfg.Pinnum = PINSEL_PIN_25;
 	PinCfg.Portnum = PINSEL_PORT_0;
 	PINSEL_ConfigPin(&PinCfg);
-	GPIO_SetDir(0, (1<<25), 0); //Set P0.25 as input
+	GPIO_SetDir(0, (1<<25), 1); //Set P0.25 as output
 
 /*
 	* Init Vbat_ADC signal on P0.26
@@ -371,6 +309,18 @@ PINSEL_CFG_Type PinCfg;
 	PinCfg.Portnum = PINSEL_PORT_1;
 	PINSEL_ConfigPin(&PinCfg);
 	GPIO_SetDir(1, (1<<23), 1); //Set P1.23 as output
+	
+	/*
+	* Init nCS signal on P1.29
+	*/
+	PinCfg.Funcnum = PINSEL_FUNC_0;
+	PinCfg.OpenDrain = PINSEL_PINMODE_NORMAL;
+	PinCfg.Pinmode = PINSEL_PINMODE_TRISTATE;
+	PinCfg.Pinnum = PINSEL_PIN_29;
+	PinCfg.Portnum = PINSEL_PORT_1;
+	PINSEL_ConfigPin(&PinCfg);
+	GPIO_SetValue(1, 1<<29);
+	GPIO_SetDir(1, (1<<29), 1); //Set P1.29 as output
 	
 	/*
 	* Init Y+ signal on P1.30

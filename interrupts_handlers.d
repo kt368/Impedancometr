@@ -2,10 +2,10 @@
 .\interrupts_handlers.o: .\include\Interrupt_handlers.h
 .\interrupts_handlers.o: .\include\drivers\lpc17xx_gpio.h
 .\interrupts_handlers.o: .\include\LPC17XX\LPC17xx.h
-.\interrupts_handlers.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm3.h
-.\interrupts_handlers.o: C:\Keil_v5\ARM\ARMCC\bin\..\include\stdint.h
-.\interrupts_handlers.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cmInstr.h
-.\interrupts_handlers.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cmFunc.h
+.\interrupts_handlers.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cm3.h
+.\interrupts_handlers.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\interrupts_handlers.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cmInstr.h
+.\interrupts_handlers.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cmFunc.h
 .\interrupts_handlers.o: .\include\LPC17XX\system_LPC17xx.h
 .\interrupts_handlers.o: .\include\drivers\lpc_types.h
 .\interrupts_handlers.o: .\include\drivers\lpc17xx_adc.h
@@ -15,7 +15,6 @@
 .\interrupts_handlers.o: .\include\protothreads\lc.h
 .\interrupts_handlers.o: .\include\protothreads\lc-switch.h
 .\interrupts_handlers.o: .\include\drivers\lpc17xx_libcfg_default.h
-.\interrupts_handlers.o: C:\Keil_v5\ARM\ARMCC\bin\..\include\math.h
-.\interrupts_handlers.o: .\include\drivers\lpc17xx_i2s.h
-.\interrupts_handlers.o: C:\Keil_v5\ARM\ARMCC\bin\..\include\stdio.h
+.\interrupts_handlers.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+.\interrupts_handlers.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 .\interrupts_handlers.o: .\include\drivers\lpc17xx_clkpwr.h

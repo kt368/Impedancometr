@@ -1,0 +1,13 @@
+.\ad7793.o: source\AD7793\AD7793.c
+.\ad7793.o: .\include\drivers\AD7793.h
+.\ad7793.o: .\include\drivers\lpc17xx_spi.h
+.\ad7793.o: .\include\LPC17XX\LPC17xx.h
+.\ad7793.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cm3.h
+.\ad7793.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\ad7793.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cmInstr.h
+.\ad7793.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cmFunc.h
+.\ad7793.o: .\include\LPC17XX\system_LPC17xx.h
+.\ad7793.o: .\include\drivers\lpc_types.h
+.\ad7793.o: .\include\drivers\Communication.h
+.\ad7793.o: .\include\drivers\lpc17xx_gpio.h
+.\ad7793.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h

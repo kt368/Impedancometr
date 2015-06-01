@@ -10,7 +10,6 @@
 extern uint32_t C;
 
 int8_t command = none;
-int8_t UART_STATE = none;
 
 char cmdbuf [15];
 int uart_rcv_len_cnt = 0;
@@ -21,14 +20,9 @@ uint8_t UART_pressed_enter = 0;
 extern struct SW_UART_FIFO_STRUCT_TYPE SW_UART_FIFO_STRUCT;
 extern uint8_t SW_UART_pop(void);
 
-extern void led_on(void);
-extern void led_off(void);
-
 extern uint8_t bg_flag;
 extern uint16_t f_min, f_max, n_F;
-uint8_t StartADC=0,StartADC_mag=0,StartADC_ph=0;
-uint32_t ADCnumber=32768;
-uint8_t os=16;
+uint8_t StartADC=0;
 
 extern uint8_t debug_mode, raw_data_mode;
 
@@ -164,27 +158,24 @@ void UART0_IRQHandler(void)
 					bg_flag = 1;
 					UART_pressed_enter = 0;
 				}
-				else if (strncmp(cmdbuf, "o ", 2) == 0)
+				else if (strncmp(cmdbuf, "r ", 2) == 0)
 				{
-					os = atoi(&(cmdbuf[2]));
-					ADCnumber = 1<<(os-1);
-					printf("\n os are %u.", os);
+					temp = atoi(&(cmdbuf[2]));
+					AD7793_SetRate(temp);
+					printf("\n AD7793 rate field = are %u.", temp);
 					printf("\n Type next command.\n>");
 					UART_pressed_enter = 0;
 				}
 				else if ( uart_rcv_len_cnt == 0)
 				{
-					NVIC_ClearPendingIRQ(I2S_IRQn);
 					StartADC=1;
-					StartADC_mag=1;
-					StartADC_ph=1;
 					UART_pressed_enter = 0;
 				}
 				else if (strncmp(cmdbuf, "g", 1) == 0)
 				{
-					temp=ADC_RUN(os);
-					printf("\n Phase are %u.", (uint16_t)((temp & 0xffff0000) >> 16));
-					printf("\n Magnitude are %u.", (uint16_t)(temp & 0xffff));
+					temp=ADC_RUN();
+					printf("\n Measured value: %u.", temp);
+					//printf("\n Magnitude are %u.", (uint16_t)(temp & 0xffff));
 					printf("\n Type next command.\n>");
 					UART_pressed_enter = 0;
 				}

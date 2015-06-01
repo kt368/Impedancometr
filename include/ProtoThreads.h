@@ -14,7 +14,6 @@
 void Init_GPIO_Pins (void);
 void Init (void);
 void Init_ADC (void);
-void Starting_init (void);
 void InitProtothreads (void);
 
 PT_THREAD(Starting(struct pt *pt));
@@ -22,4 +21,4 @@ PT_THREAD(Power_mgmt(struct pt *pt));
 PT_THREAD(Calibration(struct pt *pt));
 
 //Исправить - сделать общий хедер для АЦП
-uint16_t ADC_RUN(LPC_ADC_TypeDef *ADCx, uint8_t channel, uint8_t n_Samples, uint8_t overs_bits);
+uint16_t ADC_int_RUN(LPC_ADC_TypeDef *ADCx, uint8_t channel, uint8_t n_Samples, uint8_t overs_bits);

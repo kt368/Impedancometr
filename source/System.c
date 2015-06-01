@@ -20,12 +20,9 @@ uint32_t Rs = 0;
 uint32_t Rp = 1106;
 struct IndZwithZ_str * pIndZwithZ;
 extern void LoadCalData(void);
-extern uint8_t os;
-uint8_t I2S_complete;
 volatile uint32_t DdsFreq;
 uint8_t debug_mode = 0, raw_data_mode = 0, FirstCalStart = 1;
 uint16_t nZ_cal = 0;
-uint_fast8_t sdvig;
 uint8_t freq_index=0;		//Индекс калибровочной частоты, которая ближайшая к freq, но меньше нее
 float f_coef;
 uint32_t freq;
@@ -73,138 +70,14 @@ extern int8_t command;
 		return (uint16_t)(adc_value>>(n_Samples-1-overs_bits));
 	}
 	
-	uint32_t ADC_RUN(uint8_t n_Samples)
+	uint32_t ADC_RUN(void)
 	{
-		volatile uint32_t i2s_fifo_buf[8];
-		extern uint32_t i2s_fifo[8];
-		extern uint32_t ADCnumber;
-		uint_fast8_t i, j, data_true, ADCInProgress=1;
-		uint64_t SumAbs=0,SumPh=0;
 		uint32_t MeanAbs, MeanPh;
-		uint32_t temp2 = 0, temp3 = 0, adc_abs_counter=0, adc_ph_counter=0;
+		// Add code here
 		
-		//Измерение необходимого сдвига PCM сигнала - он почему-то плавает
-		for (sdvig=5;sdvig<9;sdvig++)
-		{
-			for (j=0;j<32;j++)
-			{
-				while (I2S_complete == 0){};
-				i2s_fifo_buf[0]=i2s_fifo[0];
-				i2s_fifo_buf[1]=i2s_fifo[1];
-				i2s_fifo_buf[2]=i2s_fifo[2];
-				i2s_fifo_buf[3]=i2s_fifo[3];
-				i2s_fifo_buf[4]=i2s_fifo[4];
-				i2s_fifo_buf[5]=i2s_fifo[5];
-				i2s_fifo_buf[6]=i2s_fifo[6];
-				i2s_fifo_buf[7]=i2s_fifo[7];
-				I2S_complete=0;
-				for (i=0;i<8;i++)
-				{
-					if ( i2s_fifo_buf[i] & (( 1<<sdvig ) ))
-					{
-						temp3 ++;
-					}
-				}
-			}
-			if (temp3 == 0)
-			{
-				temp2 = sdvig;
-			}
-			temp3 = 0;
-		}
-		sdvig = temp2+1;
-		if (debug_mode == 1)
-		{
-			printf("\n%u", sdvig);
-		}
-		temp2=pow(2,n_Samples-1);
+		MeanAbs = AD7793_SingleConversion();
 		
-		while(ADCInProgress == 1)
-		{
-			if (I2S_complete==1)
-			{
-				i2s_fifo_buf[0]=i2s_fifo[0];
-				i2s_fifo_buf[1]=i2s_fifo[1];
-				i2s_fifo_buf[2]=i2s_fifo[2];
-				i2s_fifo_buf[3]=i2s_fifo[3];
-				i2s_fifo_buf[4]=i2s_fifo[4];
-				i2s_fifo_buf[5]=i2s_fifo[5];
-				i2s_fifo_buf[6]=i2s_fifo[6];
-				i2s_fifo_buf[7]=i2s_fifo[7];
-				I2S_complete=0;
-				for (i=0;i<8;i++)
-				{
-					i2s_fifo_buf[i] = i2s_fifo_buf[i] >> sdvig;
-					if (i2s_fifo_buf[i] != 0)
-					{
-						
-						if (i2s_fifo_buf[i] >= 8388608)
-						{
-							i2s_fifo_buf[i] = i2s_fifo_buf[i] - 8388608;
-							data_true = 1;
-						}
-						else
-						{
-							i2s_fifo_buf[i] = i2s_fifo_buf[i]+8388608;
-							data_true = 1;
-						}
-					}
-					else
-					{
-						data_true = 0;
-					}
-					
-					if (data_true == 1)
-					{
-						if ( (adc_abs_counter < temp2) || (adc_ph_counter < temp2) )
-						{
-							if (i%2 != 0) //модуль импеданса
-							{
-								if (raw_data_mode ==1)
-								{
-									printf("\n%8u,",i2s_fifo_buf[i]);
-								}
-								if (adc_abs_counter < temp2)
-								{
-									SumAbs += i2s_fifo_buf[i];
-									adc_abs_counter++;
-								}
-							}
-							else
-							{
-								if (raw_data_mode ==1)
-								{
-									printf("%8u;",i2s_fifo_buf[i]);
-								}
-								if (adc_ph_counter < temp2)
-								{
-									SumPh += i2s_fifo_buf[i];
-									adc_ph_counter++;
-								}
-							}
-						}
-						else
-						{
-							//Сдвиг на 8 - переход от 24-х битных данных к 16-и битным
-							MeanAbs = (SumAbs>>(n_Samples-1)) >> 8;
-							MeanPh = (SumPh>>(n_Samples-1)) >> 8;
-							SumAbs = 0;
-							SumPh = 0;
-							adc_abs_counter = 0;
-							adc_ph_counter = 0;
-							ADCInProgress = 0;
-							if (debug_mode == 1)
-							{
-								printf("\nMeanAbs = %u", MeanAbs);
-								printf("\nMeanPh = %u", MeanPh);
-							}
-							break;
-						}
-					}
-				}
-			}
-		}
-		return ( ( ((uint16_t)MeanAbs) & 0xffff ) | ( ((uint16_t)MeanPh) & 0xffff ) << 16 );
+		return ( MeanAbs );//( ((uint16_t)MeanAbs) & 0xffff ) | ( ((uint16_t)MeanPh) & 0xffff ) << 16
 	}
 	
 	void test(void)
@@ -222,6 +95,15 @@ extern int8_t command;
 		}
 	 
 	}
+	
+	void blink(void)
+	{
+		uint32_t i;
+		
+		GPIO_SetValue (0, (1<<0));
+		for (i = 0; i < 2000000; i++);
+		GPIO_ClearValue (0, (1<<0));
+	}
 
 	void led_on(void)
 	{
@@ -232,31 +114,6 @@ extern int8_t command;
 		{
 			GPIO_ClearValue (0, (1<<0));
 		}
-	
-	void V12SW_ON2(void)
-	{
-		uint16_t counter = 1000;
-		volatile uint16_t wait_counter;
-		volatile uint16_t internal_cycle_counter=0;
-		while (counter>0)
-		{
-			GPIO_SetValue (1, (1<<22));
-			GPIO_ClearValue (1, (1<<22));
-			wait_counter=0;
-			while (wait_counter<counter + 100)
-			{
-				wait_counter+=1000/counter;
-			}
-			internal_cycle_counter++;
-			if (internal_cycle_counter>3)
-			{
-				internal_cycle_counter=0;
-				counter--;
-			}
-			//if (counter == 80) break;
-		}
-		GPIO_SetValue (1, (1<<22));
-	}
 	
 	
 	/*********************************************************************//**
@@ -435,7 +292,7 @@ PT_THREAD(Calibration(struct pt *pt))
 						temp_adc = DdsFreq;
 						AD9833_SetFreq(freq);
 						wait( (uint32_t)((float)10 * temp_adc/freq) );
-						temp_adc = ADC_RUN(os);
+						temp_adc = ADC_RUN();
 						ph = (uint16_t)((temp_adc & 0xffff0000) >> 16);
 						mag = (uint16_t)(temp_adc & 0xffff);
 						printf("\n%4u %5u %5u", cal_freq_list[freq_counter], mag, ph);
@@ -972,7 +829,7 @@ void Measure(float results[2], uint16_t freq)
 
 	float Zmin_on_cur_F, Zmax_on_cur_F;
 
-	temp_adc = ADC_RUN(os);
+	temp_adc = ADC_RUN();
 	
 	ph = (uint16_t)((temp_adc & 0xffff0000) >> 16);
 	mag = (uint16_t)(temp_adc & 0xffff);
@@ -1104,8 +961,8 @@ void GetCorrectIndexes(uint16_t* pMagCI, uint16_t* pPHCI, uint16_t freq, float m
 	
 	pPHCI[0] = CIarray[0].iZ;
 	
-	LowCurveCapIndex = GetCapIndex(CalData[CIarray[0].iZ].C);
-	LowCurveParIndex = GetParIndex(CalData[CIarray[0].iZ].Rp);
+	//LowCurveCapIndex = GetCapIndex(CalData[CIarray[0].iZ].C);
+	//LowCurveParIndex = GetParIndex(CalData[CIarray[0].iZ].Rp);
 	
 	if (debug_mode==1)
 	{
