@@ -3,9 +3,9 @@
 <title>Static Call Graph - [.\AD8302.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\AD8302.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5050106: Last Updated: Mon Jun 01 22:46:59 2015
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5050106: Last Updated: Tue Jun 02 22:32:42 2015
 <BR><P>
-<H3>Maximum Stack Usage =        664 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        680 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
 UART0_IRQHandler &rArr; Measure &rArr; GetCorrectIndexes &rArr; qsort &rArr; _partition_sort
 <P>
@@ -252,7 +252,7 @@ Global Symbols
 <P><STRONG><a name="[1b2]"></a>__rt_entry_postsh_1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$00000009))
 
 <P><STRONG><a name="[55]"></a>__rt_entry_main</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$0000000D))
-<BR><BR>[Stack]<UL><LI>Max Depth = 640 + Unknown Stack Size
+<BR><BR>[Stack]<UL><LI>Max Depth = 648 + Unknown Stack Size
 <LI>Call Chain = __rt_entry_main &rArr; main &rArr; Measure &rArr; GetCorrectIndexes &rArr; qsort &rArr; _partition_sort
 </UL>
 <BR>[Calls]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
@@ -1209,6 +1209,7 @@ Global Symbols
 <LI><a href="#[b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;AD7793_GetRegisterValue
 </UL>
 <BR>[Called By]<UL><LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;AD7793_Calibrate
+<LI><a href="#[e1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_RUN
 <LI><a href="#[d9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Init_AD7793
 </UL>
 
@@ -1292,7 +1293,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[56]"></a>main</STRONG> (Thumb, 314 bytes, Stack size 24 bytes, main.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 640 + Unknown Stack Size
+<BR><BR>[Stack]<UL><LI>Max Depth = 648 + Unknown Stack Size
 <LI>Call Chain = main &rArr; Measure &rArr; GetCorrectIndexes &rArr; qsort &rArr; _partition_sort
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;wait
@@ -1374,10 +1375,11 @@ Global Symbols
 <LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pow
 </UL>
 
-<P><STRONG><a name="[e1]"></a>ADC_RUN</STRONG> (Thumb, 12 bytes, Stack size 8 bytes, system.o(.text))
+<P><STRONG><a name="[e1]"></a>ADC_RUN</STRONG> (Thumb, 30 bytes, Stack size 8 bytes, system.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 184<LI>Call Chain = ADC_RUN &rArr; AD7793_SingleConversion &rArr; AD7793_SetRegisterValue &rArr; SPI_Write &rArr; SpiInitForAD7793 &rArr; SPI_Init &rArr; SPI_SetClock &rArr; CLKPWR_GetPCLK
 </UL>
 <BR>[Calls]<UL><LI><a href="#[c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;AD7793_SingleConversion
+<LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;AD7793_SetChannel
 </UL>
 <BR>[Called By]<UL><LI><a href="#[d6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Measure
 <LI><a href="#[d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Calibration
@@ -1432,7 +1434,7 @@ Global Symbols
 <LI><a href="#[eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;hypotf
 </UL>
 
-<P><STRONG><a name="[ed]"></a>logspace</STRONG> (Thumb, 382 bytes, Stack size 112 bytes, system.o(.text), UNUSED)
+<P><STRONG><a name="[ed]"></a>logspace</STRONG> (Thumb, 462 bytes, Stack size 112 bytes, system.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ul2f
 <LI><a href="#[e5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ui2f
 <LI><a href="#[f2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2f
@@ -1454,7 +1456,7 @@ Global Symbols
 <LI><a href="#[19]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_IRQHandler
 </UL>
 
-<P><STRONG><a name="[f5]"></a>GetPrepareStructForZcal</STRONG> (Thumb, 792 bytes, Stack size 120 bytes, system.o(.text))
+<P><STRONG><a name="[f5]"></a>GetPrepareStructForZcal</STRONG> (Thumb, 710 bytes, Stack size 120 bytes, system.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 216<LI>Call Chain = GetPrepareStructForZcal &rArr; powf &rArr; _ffix_r &rArr; __fpl_fnaninf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_cfrcmple
@@ -1477,8 +1479,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Calibration
 </UL>
 
-<P><STRONG><a name="[d4]"></a>Calibration</STRONG> (Thumb, 2174 bytes, Stack size 56 bytes, system.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 280 + Unknown Stack Size
+<P><STRONG><a name="[d4]"></a>Calibration</STRONG> (Thumb, 2188 bytes, Stack size 64 bytes, system.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 288 + Unknown Stack Size
 <LI>Call Chain = Calibration &rArr; __0sscanf &rArr; __vfscanf_char &rArr; __vfscanf &rArr; _scanf_int
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;wait
@@ -1530,7 +1532,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> system.o(.text)
 </UL>
-<P><STRONG><a name="[109]"></a>GetRealCalMagPh</STRONG> (Thumb, 748 bytes, Stack size 128 bytes, system.o(.text))
+<P><STRONG><a name="[109]"></a>GetRealCalMagPh</STRONG> (Thumb, 730 bytes, Stack size 128 bytes, system.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 224<LI>Call Chain = GetRealCalMagPh &rArr; powf &rArr; _ffix_r &rArr; __fpl_fnaninf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fmul
@@ -1691,8 +1693,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[d6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Measure
 </UL>
 
-<P><STRONG><a name="[d6]"></a>Measure</STRONG> (Thumb, 1178 bytes, Stack size 88 bytes, system.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 616 + Unknown Stack Size
+<P><STRONG><a name="[d6]"></a>Measure</STRONG> (Thumb, 1080 bytes, Stack size 96 bytes, system.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 624 + Unknown Stack Size
 <LI>Call Chain = Measure &rArr; GetCorrectIndexes &rArr; qsort &rArr; _partition_sort
 </UL>
 <BR>[Calls]<UL><LI><a href="#[fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_cfrcmple
@@ -1838,8 +1840,8 @@ Global Symbols
 
 <P><STRONG><a name="[1c6]"></a>SER_PutChar</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, serial.o(.text), UNUSED)
 
-<P><STRONG><a name="[19]"></a>UART0_IRQHandler</STRONG> (Thumb, 2002 bytes, Stack size 48 bytes, serial.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 664 + Unknown Stack Size
+<P><STRONG><a name="[19]"></a>UART0_IRQHandler</STRONG> (Thumb, 1996 bytes, Stack size 56 bytes, serial.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 680 + Unknown Stack Size
 <LI>Call Chain = UART0_IRQHandler &rArr; Measure &rArr; GetCorrectIndexes &rArr; qsort &rArr; _partition_sort
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;wait

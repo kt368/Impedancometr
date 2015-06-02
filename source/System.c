@@ -70,14 +70,16 @@ extern int8_t command;
 		return (uint16_t)(adc_value>>(n_Samples-1-overs_bits));
 	}
 	
-	uint32_t ADC_RUN(void)
+	void ADC_RUN(uint32_t* result)
 	{
 		uint32_t MeanAbs, MeanPh;
 		// Add code here
 		
-		MeanAbs = AD7793_SingleConversion();
-		
-		return ( MeanAbs );//( ((uint16_t)MeanAbs) & 0xffff ) | ( ((uint16_t)MeanPh) & 0xffff ) << 16
+		AD7793_SetChannel(AD7793_CH_AIN1P_AIN1M);
+		result[0] = AD7793_SingleConversion();
+		AD7793_SetChannel(AD7793_CH_AIN2P_AIN2M);
+		result[1] = AD7793_SingleConversion();
+
 	}
 	
 	void test(void)
@@ -170,7 +172,8 @@ PT_THREAD(Calibration(struct pt *pt))
 {
 	uint_fast8_t freq_counter;
 	
-	volatile uint32_t temp_adc;
+	uint32_t result[2];
+	volatile uint32_t temp_freq;
 	
 	uint8_t temp2;
 	uint16_t temp;
@@ -289,12 +292,12 @@ PT_THREAD(Calibration(struct pt *pt))
 					for (freq_counter = CalDataCalibr->nFmin; freq_counter < CalDataCalibr->nFmax; freq_counter ++)
 					{
 						freq = cal_freq_list[freq_counter] * 1000;
-						temp_adc = DdsFreq;
+						temp_freq = DdsFreq;
 						AD9833_SetFreq(freq);
-						wait( (uint32_t)((float)10 * temp_adc/freq) );
-						temp_adc = ADC_RUN();
-						ph = (uint16_t)((temp_adc & 0xffff0000) >> 16);
-						mag = (uint16_t)(temp_adc & 0xffff);
+						wait( (uint32_t)((float)10 * temp_freq/freq) );
+						ADC_RUN(result);
+						ph = result[1];
+						mag = result[0];
 						printf("\n%4u %5u %5u", cal_freq_list[freq_counter], mag, ph);
 						CalDataCalibr->Zarray[freq_counter - CalDataCalibr->nFmin].mag = mag;
 						CalDataCalibr->Zarray[freq_counter - CalDataCalibr->nFmin].ph = ph;
@@ -824,15 +827,16 @@ void Measure(float results[2], uint16_t freq)
 	uint16_t	I_Zcal_max_1=0;		//Индекс калибровочной нагрузки, имеющей максимальное сопротивление на нижней частоте диапазона
 	uint16_t	I_Zcal_max_2=0;		//Индекс калибровочной нагрузки, имеющей максимальное сопротивление на верхней частоте диапазона
 	
-	uint32_t temp_adc;
 	uint8_t MCount;
 
 	float Zmin_on_cur_F, Zmax_on_cur_F;
-
-	temp_adc = ADC_RUN();
 	
-	ph = (uint16_t)((temp_adc & 0xffff0000) >> 16);
-	mag = (uint16_t)(temp_adc & 0xffff);
+	uint32_t result[2];
+
+	ADC_RUN(result);
+	
+	ph = result[1];
+	mag = result[0];
 	
 	if (freq < cal_freq_list[nF_cal-1])
 	//Если текущая измерительная частота не равна максимальной калибровочной частоте

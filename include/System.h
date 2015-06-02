@@ -130,7 +130,7 @@ extern int __disable_irq(void);
 PT_THREAD(Starting(struct pt *pt));
 
 uint16_t ADC_int_RUN(LPC_ADC_TypeDef *ADCx, ADC_CHANNEL_SELECTION channel, uint8_t n_Samples, uint8_t overs_bits);
-uint32_t ADC_RUN(void);
+void ADC_RUN(uint32_t *result);
 
 void SaveCalData( struct CalData_struct* CalDataClibr, uint8_t stop_bit );
 

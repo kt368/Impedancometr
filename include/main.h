@@ -32,7 +32,7 @@ extern void AD9833_SetFreq(uint32_t freq);
 extern void AD9833_SetPhase(uint16_t phase);
 extern void AD9833_Stop(void);
 extern void AD9833_Start(void);
-extern uint32_t ADC_RUN(void);
+extern void ADC_RUN(uint32_t *result);
 extern PT_THREAD(Power_mgmt(struct pt *pt));
 extern PT_THREAD(Calibration(struct pt *pt));
 

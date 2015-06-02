@@ -66,6 +66,8 @@ void UART0_IRQHandler(void)
 	uint32_t temp;
 	uint32_t U0IIR = 0;
 	uint32_t baudrate;
+	uint32_t result[2];
+	
 	extern uint8_t CorrectIndexesOverride;
 	extern uint8_t CorrectIndexesBrute;
 	extern uint8_t EqualIndexes;
@@ -173,9 +175,9 @@ void UART0_IRQHandler(void)
 				}
 				else if (strncmp(cmdbuf, "g", 1) == 0)
 				{
-					temp=ADC_RUN();
-					printf("\n Measured value: %u.", temp);
-					//printf("\n Magnitude are %u.", (uint16_t)(temp & 0xffff));
+					ADC_RUN(result);
+					printf("\n  Magnitude are %u.", result[0]);
+					printf("\n  Phase are %u.", result[1]);
 					printf("\n Type next command.\n>");
 					UART_pressed_enter = 0;
 				}
