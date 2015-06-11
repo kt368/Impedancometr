@@ -439,54 +439,14 @@
               <FilePath>.\source\drivers\lpc17xx_spi.c</FilePath>
             </File>
             <File>
-              <FileName>lpc17xx_systick.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\source\drivers\lpc17xx_systick.c</FilePath>
-            </File>
-            <File>
-              <FileName>lpc17xx_timer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\source\drivers\lpc17xx_timer.c</FilePath>
-            </File>
-            <File>
               <FileName>lpc17xx_uart.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\source\drivers\lpc17xx_uart.c</FilePath>
             </File>
             <File>
-              <FileName>lpc17xx_wdt.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\source\drivers\lpc17xx_wdt.c</FilePath>
-            </File>
-            <File>
-              <FileName>lpc17xx_adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\source\drivers\lpc17xx_adc.c</FilePath>
-            </File>
-            <File>
-              <FileName>lpc17xx_clkpwr.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\source\drivers\lpc17xx_clkpwr.c</FilePath>
-            </File>
-            <File>
               <FileName>lpc17xx_gpio.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\source\drivers\lpc17xx_gpio.c</FilePath>
-            </File>
-            <File>
-              <FileName>lpc17xx_libcfg_default.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\source\drivers\lpc17xx_libcfg_default.c</FilePath>
-            </File>
-            <File>
-              <FileName>lpc17xx_nvic.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\source\drivers\lpc17xx_nvic.c</FilePath>
-            </File>
-            <File>
-              <FileName>lpc17xx_i2s.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\source\drivers\lpc17xx_i2s.c</FilePath>
             </File>
             <File>
               <FileName>AD7793.c</FileName>
@@ -498,16 +458,21 @@
               <FileType>1</FileType>
               <FilePath>.\source\AD7793\Communication.c</FilePath>
             </File>
+            <File>
+              <FileName>lpc17xx_libcfg_default.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\drivers\lpc17xx_libcfg_default.c</FilePath>
+            </File>
+            <File>
+              <FileName>lpc17xx_clkpwr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\drivers\lpc17xx_clkpwr.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>Source</GroupName>
           <Files>
-            <File>
-              <FileName>Flash_save_read.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\source\Flash_save_read.c</FilePath>
-            </File>
             <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
@@ -523,26 +488,6 @@
               <FileType>1</FileType>
               <FilePath>.\source\System.c</FilePath>
             </File>
-            <File>
-              <FileName>ProtoThreads.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\source\ProtoThreads.c</FilePath>
-            </File>
-            <File>
-              <FileName>Interrupts_handlers.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\source\Interrupts_handlers.c</FilePath>
-            </File>
-            <File>
-              <FileName>AD9833.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\source\AD9833.c</FilePath>
-            </File>
-            <File>
-              <FileName>Power_management.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\source\Power_management.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -552,11 +497,6 @@
               <FileName>Serial.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\source\Serial.c</FilePath>
-            </File>
-            <File>
-              <FileName>Retarget.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\source\Retarget.c</FilePath>
             </File>
             <File>
               <FileName>SW_FIFO.c</FileName>
