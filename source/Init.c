@@ -5,29 +5,15 @@
  *
 ******************************************************************************/
 #include "Init.h"                       /* Init file header */
-#define fs 65104 //65107 65105
 
 PINSEL_CFG_Type PinCfg;
 
 	void Init(void)
 	{
-		extern uint32_t cal_freq_list[];
 		
-		//SYSTICK_InternalInit(10);				//Initialize SysTIck counter for 5 ms ticks
-		//SYSTICK_Cmd(ENABLE);						
-
-//Enable SysTick counter
-		//NVIC_SetPriority (SysTick_IRQn, (1<<__NVIC_PRIO_BITS) - 1);
-		//SYSTICK_IntCmd(ENABLE);				//Enable SysTick counter interrupts
 		V12SW_OFF;
 		Init_GPIO_Pins();
-		//Init_ADC();
 		V12SW_ON;
-		SER_Init(115200);
-		Init_AD7793();
-		test();
-		
-		
 		BatCharge_OFF;								
 		//Switch OFF battarey charging
 		
@@ -45,19 +31,12 @@ PINSEL_CFG_Type PinCfg;
 		
 		Vbat_supply_ON;								
 	//receive power from battarey through main switch
-
-		//NVIC_SetPriority(UART0_IRQn,0);
-		
+	
+		SER_Init(115200);
+		Init_AD7793();
+		test();
 	}
 
-	void Init_ADC(void)
-	{
-		/* Configuration for ADC :
-    *  ADC conversion rate = 200KHz
-    */
-    ADC_Init(LPC_ADC, 200000);
-    ADC_ChannelCmd(LPC_ADC,2,ENABLE);
-	}
 	void Init_AD7793(void)
 	{
 		uint8_t AD7793_Init_result;
@@ -66,11 +45,10 @@ PINSEL_CFG_Type PinCfg;
 		{
 			printf("\n AD7793 Init Error\n>");
 		}
-		blink();
 
 		AD7793_SetMode(AD7793_MODE_IDLE);
 		AD7793_SetClk(AD7793_CLK_INT);
-		AD7793_SetRate(0xF);
+		AD7793_SetRate(0x6);
 		AD7793_SetBias(0x0);
 		AD7793_SetBO(0);
 		AD7793_SetUnB(1);
@@ -81,8 +59,6 @@ PINSEL_CFG_Type PinCfg;
 		AD7793_SetChannel(AD7793_CH_AIN1P_AIN1M);
 		AD7793_Calibrate(AD7793_MODE_CAL_INT_ZERO, AD7793_CH_AIN1P_AIN1M);
 		AD7793_Calibrate(AD7793_MODE_CAL_INT_FULL, AD7793_CH_AIN1P_AIN1M);
-		
-		blink();
 		
 	}
 	

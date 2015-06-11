@@ -61,7 +61,6 @@ unsigned char AD7793_Init(void)
 
 	SpiInitForAD7793(LPC_SPI);
 	
-	blink();
 	AD7793_Reset();
     if((AD7793_GetRegisterValue(AD7793_REG_ID, 1, 1) & 0x0F) != AD7793_ID)
 	{
