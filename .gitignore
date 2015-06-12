@@ -1,0 +1,14 @@
+*.txt
+*.crf
+*.d
+*.o
+*.axf
+*.htm
+*.lnp
+*.map
+*.sct
+*.bak
+*uvgui*
+*.iex
+*.jflash
+*.mot
