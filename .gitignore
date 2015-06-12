@@ -12,3 +12,5 @@
 *.iex
 *.jflash
 *.mot
+*.dep
+*.lst
