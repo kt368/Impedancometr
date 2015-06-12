@@ -455,7 +455,7 @@ void SpiInitForAD7793(LPC_SPI_TypeDef *SPIx)
 {
 	SPI_CFG_Type SPI_GonfigStruct;
 	
-	SPI_GonfigStruct.ClockRate = 100000;
+	SPI_GonfigStruct.ClockRate = 1000000;
 	SPI_GonfigStruct.CPHA = SPI_CPHA_SECOND;
 	SPI_GonfigStruct.CPOL = SPI_CPOL_LO;
 	SPI_GonfigStruct.Databit = SPI_DATABIT_8;

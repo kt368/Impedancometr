@@ -1,6 +1,6 @@
 #include <LPC17XX.h>                       /* LPC17XX definitions         */
 #include "lpc17xx_uart.h"
-#define SW_UART_FIFO_SIZE 128
+#define SW_UART_FIFO_SIZE 1024
 
 struct SW_UART_FIFO_STRUCT_TYPE{
   uint16_t		size;
