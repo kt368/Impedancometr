@@ -15,6 +15,7 @@
 ".\serial.o"
 ".\sw_fifo.o"
 ".\getline.o"
+".\retarget.o"
 --strict --scatter ".\AD8302.sct"
 --summary_stderr --info summarysizes --map --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

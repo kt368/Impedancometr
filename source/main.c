@@ -28,7 +28,7 @@ uint8_t test_flag = 0;
 		if (test_flag == 1)
 		{
 			AD7793_SetChannel(AD7793_CH_AIN1P_AIN1M);
-			for (i = 0; i < 5000; i++)
+			for (i = 0; i < 2000; i++)
 				{
 					printf("\n%lu", AD7793_SingleConversion());
 				}
