@@ -48,7 +48,7 @@ PINSEL_CFG_Type PinCfg;
 
 		AD7793_SetMode(AD7793_MODE_IDLE);
 		AD7793_SetClk(AD7793_CLK_INT);
-		AD7793_SetRate(0x6);
+		AD7793_SetRate(0xF);
 		AD7793_SetBias(0x0);
 		AD7793_SetBO(0);
 		AD7793_SetUnB(1);

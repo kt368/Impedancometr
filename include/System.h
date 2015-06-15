@@ -6,6 +6,7 @@
 
 
 //Definitions of UART commands
+#define Calibrate	7
 #define f					9
 #define BADKEY		-1
 #define	none			0

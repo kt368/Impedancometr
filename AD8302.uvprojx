@@ -488,6 +488,21 @@
               <FileType>1</FileType>
               <FilePath>.\source\System.c</FilePath>
             </File>
+            <File>
+              <FileName>AD9833.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\AD9833.c</FilePath>
+            </File>
+            <File>
+              <FileName>Calibrating.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\Calibrating.c</FilePath>
+            </File>
+            <File>
+              <FileName>Measuring.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\Measuring.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

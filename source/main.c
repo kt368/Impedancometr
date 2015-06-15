@@ -1,6 +1,7 @@
 #include "main.h"   /* My big header definitions         */
 #include "AD9833.h"
 #include "lpc17xx_clkpwr.h"
+#include "system.h"
 
 extern struct SW_UART_FIFO_STRUCT_TYPE SW_UART_FIFO_STRUCT;
 
@@ -18,6 +19,12 @@ uint8_t test_flag = 0;
 	printf("Started!");
 	
 	blink();
+		
+		
+	AD8302_MAG;
+	AD9833_SetFreq(100000);
+	AD9833_SetPhase(0);
+	AD9833_Start();
 	
 	printf ("\nType command.\n>");
 	
@@ -25,6 +32,10 @@ uint8_t test_flag = 0;
 	
 	while(1)
 	{
+		if (command == Calibrate)
+		{
+			
+		}
 		if (test_flag == 1)
 		{
 			AD7793_SetChannel(AD7793_CH_AIN1P_AIN1M);

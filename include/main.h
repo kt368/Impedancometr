@@ -24,5 +24,7 @@ extern void Init (void);
 extern void test(void);
 extern void wait(uint32_t);
 
+extern int8_t command;
+
 extern void ADC_RUN(uint32_t *result);
 

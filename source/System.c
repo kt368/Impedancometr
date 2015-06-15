@@ -1,6 +1,7 @@
 #include "System.h"
 
 extern int8_t command;
+volatile uint32_t DdsFreq;
 
 	void ADC_RUN(uint32_t* result)
 	{

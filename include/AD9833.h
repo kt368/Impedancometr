@@ -69,6 +69,7 @@ void AD9833_SetFreq(uint32_t freq);			// AD9833 frequensy select function
 void AD9833_SetPhase(uint16_t phase);		// AD9833 phase select function
 void AD9833_Stop(void);									// AD9833 stop generating function
 void AD9833_Run(void);									// AD9833 start generating function
+void AD9833_Start(void);										// Start (enable, no reset, sinusoidal signal) DDS AD9833
 
 
 /**
