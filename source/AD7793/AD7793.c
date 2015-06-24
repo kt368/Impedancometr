@@ -47,6 +47,7 @@
 #include "Communication.h"		// Communication definitions.
 #include <stdio.h>				// For printf
 extern void blink(void);
+extern void wait(uint32_t t);
 
 /***************************************************************************//**
  * @brief Initializes the AD7793 and checks if the device is present.
@@ -62,6 +63,7 @@ unsigned char AD7793_Init(void)
 	SpiInitForAD7793(LPC_SPI);
 	
 	AD7793_Reset();
+	wait(10);
     if((AD7793_GetRegisterValue(AD7793_REG_ID, 1, 1) & 0x0F) != AD7793_ID)
 	{
 		status = 0x0;

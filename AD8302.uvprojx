@@ -468,6 +468,11 @@
               <FileType>1</FileType>
               <FilePath>.\source\drivers\lpc17xx_clkpwr.c</FilePath>
             </File>
+            <File>
+              <FileName>lpc17xx_timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\drivers\lpc17xx_timer.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -502,6 +507,11 @@
               <FileName>Measuring.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\source\Measuring.c</FilePath>
+            </File>
+            <File>
+              <FileName>Flash_save_read.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\Flash_save_read.c</FilePath>
             </File>
           </Files>
         </Group>

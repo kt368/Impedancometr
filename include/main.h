@@ -9,6 +9,7 @@
 #include "lpc17xx_libcfg_default.h"
 #include "GPIO_signals.h"
 #include "System.h"
+#include "lpc17xx_timer.h"
 
 
 struct SW_UART_FIFO_STRUCT_TYPE{

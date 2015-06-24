@@ -34,6 +34,7 @@ PINSEL_CFG_Type PinCfg;
 	
 		SER_Init(115200);
 		Init_AD7793();
+		Timer0Init();
 		test();
 	}
 
@@ -60,6 +61,18 @@ PINSEL_CFG_Type PinCfg;
 		AD7793_Calibrate(AD7793_MODE_CAL_INT_ZERO, AD7793_CH_AIN1P_AIN1M);
 		AD7793_Calibrate(AD7793_MODE_CAL_INT_FULL, AD7793_CH_AIN1P_AIN1M);
 		
+	}
+	void Timer0Init(void)
+	{
+		extern void TIM_Init(LPC_TIM_TypeDef *TIMx, TIM_MODE_OPT TimerCounterMode, void *TIM_ConfigStruct);
+		extern void TIM_Cmd(LPC_TIM_TypeDef *TIMx, FunctionalState NewState);
+		TIM_TIMERCFG_Type TMRCFG;
+		
+		TMRCFG.PrescaleOption = TIM_PRESCALE_USVAL;
+		TMRCFG.PrescaleValue = 1000;
+		
+		TIM_Init(LPC_TIM0, TIM_TIMER_MODE, &TMRCFG);
+		TIM_Cmd(LPC_TIM0,ENABLE);
 	}
 	
 	void Init_GPIO_Pins (void)

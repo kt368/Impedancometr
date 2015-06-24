@@ -6,6 +6,8 @@
 #include "Serial.h"
 #include "lpc17xx_clkpwr.h"
 
+#define CorrectIndexesPutting 1
+
 extern uint32_t C;
 
 int8_t command = none;
@@ -20,6 +22,12 @@ extern struct SW_UART_FIFO_STRUCT_TYPE SW_UART_FIFO_STRUCT;
 extern uint8_t SW_UART_pop(void);
 
 extern uint8_t test_flag;
+extern uint8_t debug_mode;
+extern uint8_t CorrectIndexesBrute;
+extern uint8_t CorrectIndexesOverride;
+extern uint8_t EqualIndexes;
+extern void Measure(float results[2], uint16_t freq);
+extern uint16_t frequency;
 
 void SER_Init(uint32_t baudrate)
 {
@@ -56,7 +64,14 @@ void UART0_IRQHandler(void)
 	static char *line = &cmdbuf[0];
 	uint32_t U0IIR = 0;
 	uint32_t result[2];
+	float results[2];
+	uint32_t temp;
+	extern uint16_t f_min, f_max, n_F;
+	extern uint8_t bg_flag;
 	
+	extern uint16_t FirstOverrideIndex;
+	extern uint16_t SecondOverrideIndex;
+	char *EndFromStrtoul;
 
 	U0IIR=UART_GetIntId(LPC_UART0);
 	if ((U0IIR & 0xE) == 0x4)
@@ -91,11 +106,85 @@ void UART0_IRQHandler(void)
 			UART_pressed_enter = 1;
 			if (command == none)
 			{
-				if (strncmp(cmdbuf, "g", 1) == 0)
+				if ( (strcmp(cmdbuf, "cal") == 0) && uart_rcv_len_cnt == 3)
+				{
+					command = Calibrate;
+					printf("\n Entered into calibrating state. Type calibrating command.\n>");
+					UART_pressed_enter = 0;
+				}
+				else if (strncmp(cmdbuf, "d ", 2) == 0)
+				{
+					debug_mode = atoi(&(cmdbuf[2]));
+					if (debug_mode == 0)
+					{
+						printf("\n Debug mode disabled.");
+					}
+					else
+					{
+						printf("\n Debug mode enabled.");
+					}
+					printf("\nType next command.\n>");
+					UART_pressed_enter = 0;
+				}
+				else if (strncmp(cmdbuf, "g", 1) == 0)
 				{
 					ADC_RUN(result);
 					printf("\n  Magnitude are %u.", result[0]);
 					printf("\n  Phase are %u.", result[1]);
+					printf("\n Type next command.\n>");
+					UART_pressed_enter = 0;
+				}
+				else if (strncmp(cmdbuf, "c", 1) == 0)
+				{
+					AD7793_SetChannel(AD7793_CH_AIN1P_AIN1M);
+					result[0] = AD7793_ContinuousReadAvg(20);
+					AD7793_SetChannel(AD7793_CH_AIN2P_AIN2M);
+					result[1] = AD7793_ContinuousReadAvg(20);
+					printf("\n  Magnitude are %04x.", result[0]>>4);
+					printf("\n  Phase are     %04x.", result[1]>>4);
+					printf("\n Type next command.\n>");
+					UART_pressed_enter = 0;
+				}
+				else if (strncmp(cmdbuf, "f ", 2) == 0)
+				{
+					frequency = atoi(&(cmdbuf[2]));
+					AD9833_SetFreq(frequency*1000);
+					AD9833_Start();
+					printf("\n New DDS frequency is %u kHz. ", frequency);
+					printf("\n Type next command.\n>");
+					UART_pressed_enter = 0;
+				}
+				else if (strncmp(cmdbuf, "fmin ", 5) == 0)
+				{
+					f_min = atoi(&(cmdbuf[5]));
+					printf("\n f_min are %u kHz.", f_min);
+					printf("\n Type next command.\n>");
+					UART_pressed_enter = 0;
+				}
+				else if (strncmp(cmdbuf, "fmax ", 5) == 0)
+				{
+					f_max = atoi(&(cmdbuf[5]));
+					printf("\n f_max are %u kHz.", f_max);
+					printf("\n Type next command.\n>");
+					UART_pressed_enter = 0;
+				}
+				else if (strncmp(cmdbuf, "nf ", 3) == 0)
+				{
+					n_F = atoi(&(cmdbuf[3]));
+					printf("\n n_F are %u.", n_F);
+					printf("\n Type next command.\n>");
+					UART_pressed_enter = 0;
+				}
+				else if ((strncmp(cmdbuf, "bg", 2) == 0) && uart_rcv_len_cnt == 2)
+				{
+					bg_flag = 1;
+					UART_pressed_enter = 0;
+				}
+				else if (strncmp(cmdbuf, "r ", 2) == 0)
+				{
+					temp = atoi(&(cmdbuf[2]));
+					AD7793_SetRate(temp);
+					printf("\n AD7793 rate field = are %u.", temp);
 					printf("\n Type next command.\n>");
 					UART_pressed_enter = 0;
 				}
@@ -104,11 +193,79 @@ void UART0_IRQHandler(void)
 					test_flag = 1;
 					UART_pressed_enter = 0;
 				}
+				else if ( (strcmp(cmdbuf, "m") == 0) && uart_rcv_len_cnt == 1)
+				{
+					wait(1);
+					Measure(results, frequency);
+					printf("\n Magnitude of impedance is: ");
+					printf("%.1f Ohm.", results[0]);
+					printf("\n Phase of impedance is: ");
+					printf("%.2f graduses.", results[1]*57.295779513);
+					printf("\nType next command.\n>");
+					UART_pressed_enter = 0;
+				}
+				else if (strncmp(cmdbuf, "CIO ", 4) == 0)
+				{
+					CorrectIndexesOverride = atoi(&(cmdbuf[4]));
+					if (CorrectIndexesOverride == 1)
+					{
+						printf("\nEnter correct override indexes:\n>");
+						command = CorrectIndexesPutting;
+					}
+					else
+					{
+						printf("\n Index overriding disabled.");
+						printf("\nType next command.\n>");
+					}
+					UART_pressed_enter = 0;
+				}
+				else if (strncmp(cmdbuf, "CIB ", 4) == 0)
+				{
+					CorrectIndexesBrute = atoi(&(cmdbuf[4]));
+					if (CorrectIndexesBrute == 1)
+					{
+						printf("\n Correct calibrating curves brute forcing enabled.");
+						printf("\nType next command.\n>");
+					}
+					else
+					{
+						printf("\n Correct calibrating curves brute force disabled.");
+						printf("\nType next command.\n>");
+					}
+					UART_pressed_enter = 0;
+				}
+				else if (strncmp(cmdbuf, "EI ", 3) == 0)
+				{
+					EqualIndexes = atoi(&(cmdbuf[3]));
+					if (EqualIndexes == 1)
+					{
+						printf("\n Equal calibrating indexes for mag and phase enabled.");
+						printf("\nType next command.\n>");
+					}
+					else
+					{
+						printf("\n Equal calibrating indexes for mag and phase disabled.");
+						printf("\nType next command.\n>");
+					}
+					UART_pressed_enter = 0;
+				}
 				else
 				{
 					printf("\nWrong command. Please type right command.\n");
 					UART_pressed_enter = 0;
 				}
+				memset(cmdbuf,0,15);
+				uart_rcv_len_cnt=0;
+			}
+			else if (command == CorrectIndexesPutting)
+			{
+				FirstOverrideIndex	= strtoul(cmdbuf, &EndFromStrtoul, 10);
+				SecondOverrideIndex = atoi(EndFromStrtoul);
+				printf("\n FirstCorrectIndex = %u", FirstOverrideIndex);
+				printf("\n SecondCorrectIndex = %u", SecondOverrideIndex);
+				printf("\nType next command.\n>");
+				UART_pressed_enter = 0;
+				command = none;
 				memset(cmdbuf,0,15);
 				uart_rcv_len_cnt=0;
 			}
